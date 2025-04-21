@@ -12,9 +12,9 @@ export default function Navbar() {
               
                 <motion.div
                     whileHover={{ scale: 1.1 }}
-                    className="text-2xl font-bold text-gray-800 cursor-pointer "
+                    className="text-2xl font-bold text-gray-800 cursor-pointer px-4"
                 >   <div className="flex">
-                   {/* <img src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" alt="Logo" className="h-12 w-12 rounded-2xl" /> */}
+                   <img src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" alt="Logo" className="h-12 w-12 rounded-2xl" />
                     <div className="text-4xl">laro</div>
                     </div>
                 </motion.div>

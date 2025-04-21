@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-
+import ScrollZoomVideo from "../components/scrollZoom";
 const containerVariants = {
     hidden: {},
     visible: {
@@ -76,7 +76,7 @@ const containerVariants = {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl sm:text-4xl md:text-[3rem] lg:text-[90px] font-semibold text-shadow-gray-600 max-w-7xl mb-6"
+          className="text-xl sm:text-[4rem] md:text-[3rem] lg:text-[90px] font-semibold text-shadow-gray-600 max-w-7xl mb-6"
         >
           Where style meets simplicity — Shop smarter, live better
         </motion.div>
@@ -99,9 +99,10 @@ const containerVariants = {
         >
           Get Started
         </motion.button>
-    <div className="h-[400px] w-full bg-amber-950 z-50 hidden">
-        <h1>bruhh</h1>
-    </div>
+          <div className="w-full max-w-5xl h-max-[400px] z-0 overflow-hidden rounded-2xl" >
+      <ScrollZoomVideo />
+          </div>
+
     
         <div className="w-full">
           <motion.div
