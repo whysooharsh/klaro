@@ -16,7 +16,7 @@ const ScrollZoomVideo = () => {
 
   return (
     <div className="h-auto bg-transparent flex items-start justify-center overflow-hidden">
-      <div className="sticky top-20 z-50 relative w-full max-w-4xl">
+      <div className=" top-20 z-50 relative w-full max-w-4xl">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white text-3xl md:text-5xl font-bold text-center px-4">
         Stay ahead of the style curve
         </div>
