@@ -6,16 +6,16 @@ export default function Navbar() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-white shadow-md sticky top-0 z-50"
+            className="bg-white shadow-md sticky top-0 left-0 z-50 font-Grotesque"
         >
-            <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div className="container mx-auto px-2 py-5 flex justify-between items-center shadow-black">
               
                 <motion.div
                     whileHover={{ scale: 1.1 }}
-                    className="text-2xl font-bold text-gray-800 cursor-pointer"
+                    className="text-2xl font-bold text-gray-800 cursor-pointer "
                 >   <div className="flex">
-                   <img src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" alt="Logo" className="h-8 w-8" />
-                    laro
+                   {/* <img src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" alt="Logo" className="h-12 w-12 rounded-2xl" /> */}
+                    <div className="text-4xl">laro</div>
                     </div>
                 </motion.div>
                 
