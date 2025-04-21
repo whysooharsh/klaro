@@ -99,7 +99,9 @@ const containerVariants = {
         >
           Get Started
         </motion.button>
-    <div className="h-[400px] bg-black z-50"></div>
+    <div className="h-[400px] w-full bg-amber-950 z-50 hidden">
+        <h1>bruhh</h1>
+    </div>
     
         <div className="w-full">
           <motion.div
