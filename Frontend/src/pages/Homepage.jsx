@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ScrollZoomVideo from "../components/scrollZoom";
 import Footer from "../components/footer";
-import { useNavigate } from "react-router-dom";
+
 
 const containerVariants = {
   hidden: {},
@@ -319,7 +319,7 @@ export default function Homepage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-lg font-medium hover:bg-white/10 transition text-lg"
-            onClick={() => navigate('/collections')}
+            onClick={() => navigate('/shop')}
           >
             Explore Collections
           </motion.button>
@@ -395,7 +395,6 @@ export default function Homepage() {
               whileHover={{ scale: 1.05 }}
               onClick={() => navigate('/all-products')}
               className="text-black border-b-2 border-black pb-1 hidden md:block"
-              onClick={() => navigate('/shop')}
             >
               View All Products →
             </motion.button>
@@ -443,7 +442,6 @@ export default function Homepage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/all-products')}
               className="bg-neutral-800 text-white px-5 py-3 rounded-full font-medium"
-              onClick={() => navigate('/shop')}
             >
               View All Products
             </motion.button>
@@ -597,14 +595,7 @@ export default function Homepage() {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {[
-              "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-              "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-              "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-              "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-              "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-              "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
-            ].map((image, idx) => (
+            {instagramPosts.map((post, idx) => (
               <motion.div 
                 key={post.id}
                 initial={{ opacity: 0 }}
@@ -614,7 +605,7 @@ export default function Homepage() {
                 className="group relative aspect-square overflow-hidden rounded-lg cursor-pointer"
               >
                 <img 
-                  src={image}
+                  src={post.image}
                   alt="Instagram post" 
                   className="w-full h-full object-cover hover:brightness-75 transition"
                 />
