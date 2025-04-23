@@ -24,12 +24,10 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
   const handleUserMessage = (message) => {
     if (!message.trim()) return;
 
-    // Add user message to chat
     const newMessages = [...messages, { text: message, isBot: false }];
     setMessages(newMessages);
     setUserInput('');
 
-    // Process user message and generate response
     const response = generateBotResponse(message, products);
     setTimeout(() => {
       setMessages([...newMessages, response]);
@@ -41,7 +39,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
     let recommendedProducts = [];
     let responseText = "";
 
-    // Check for specific keywords and categories
     if (lowercaseMessage.includes('dress') || lowercaseMessage.includes('dresses')) {
       recommendedProducts = products.filter(p => p.category === 'Dresses');
       responseText = "Here are some beautiful dresses that might interest you!";
@@ -53,7 +50,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       responseText = "Check out these stylish bottoms!";
     }
 
-    // Check for style preferences
     if (lowercaseMessage.includes('formal') || lowercaseMessage.includes('office')) {
       recommendedProducts = products.filter(p => p.tags.some(tag => ['formal', 'office'].includes(tag)));
       responseText = "Here are some formal and office-appropriate items!";
@@ -62,13 +58,11 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       responseText = "These casual pieces are perfect for everyday wear!";
     }
 
-    // Check for specific occasions
     if (lowercaseMessage.includes('party') || lowercaseMessage.includes('evening')) {
       recommendedProducts = products.filter(p => p.tags.some(tag => ['party', 'evening'].includes(tag)));
       responseText = "I found some perfect party and evening wear options!";
     }
 
-    // Check for price-related queries
     if (lowercaseMessage.includes('cheap') || lowercaseMessage.includes('affordable') || lowercaseMessage.includes('budget')) {
       recommendedProducts = products.filter(p => p.price < 50);
       responseText = "Here are some affordable options within your budget!";
@@ -77,7 +71,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       responseText = "Here are some premium options for you!";
     }
 
-    // If products were found, recommend them
     if (recommendedProducts.length > 0) {
       onProductRecommend(recommendedProducts);
       return {
@@ -86,7 +79,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       };
     }
 
-    // Check for cart-related queries
     if (lowercaseMessage.includes('cart') || lowercaseMessage.includes('basket')) {
       if (cartItems.length > 0) {
         return {
@@ -101,7 +93,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       }
     }
 
-    // Check for wishlist-related queries
     if (lowercaseMessage.includes('wishlist') || lowercaseMessage.includes('favorite')) {
       if (wishlistItems.length > 0) {
         return {
@@ -116,7 +107,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       }
     }
 
-    // Default response if no specific matches
     return {
       text: "I'm here to help you find the perfect outfit! You can ask me about:\n- Specific types of clothing (dresses, tops, bottoms)\n- Occasions (formal, casual, party)\n- Price ranges (affordable, premium)\n- Your cart or wishlist\nWhat would you like to know?",
       isBot: true
