@@ -174,7 +174,7 @@ export default function AllProducts() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header Section */}
+     
       <div className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4">
           <motion.h1 

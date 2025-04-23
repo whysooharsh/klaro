@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
+    const handleLinkClick = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
         <motion.footer 
             initial={{ opacity: 0 }}
@@ -10,7 +15,7 @@ export default function Footer() {
             className="bg-neutral-50 pt-12 pb-8 font-Grotesque border-t border-neutral-200 w-full"
         >
             <div className="w-full max-w-7xl mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
               
                     <motion.div 
                         initial={{ y: 20, opacity: 0 }}
@@ -47,7 +52,7 @@ export default function Footer() {
                         className="flex flex-col space-y-2"
                     >
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Shop</h3>
-                        {['New Arrivals', 'Best Sellers', 'Men', 'Women', 'Accessories', 'Sale'].map((item) => (
+                        {['New Arrivals', 'Best Sellers', 'Special Offers', 'Women', 'Partners', 'Sale'].map((item) => (
                             <motion.a 
                                 key={item} 
                                 href="#" 
@@ -66,15 +71,53 @@ export default function Footer() {
                         className="flex flex-col space-y-2"
                     >
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Support</h3>
-                        {['FAQ', 'Shipping & Returns', 'Contact Us', 'Size Guide', 'Privacy Policy', 'Terms of Service'].map((item) => (
-                            <motion.a 
-                                key={item} 
-                                href="#" 
+                        {[
+                            { label: 'FAQ', path: '/faq' },
+                            { label: 'Shipping & Returns', path: '#' },
+                            { label: 'Contact Us', path: '/contact' },
+                            { label: 'Size Guide', path: '/size-guide' },
+                            { label: 'Privacy Policy', path: '#' },
+                            { label: 'Terms of Service', path: '/terms' }
+                        ].map((item) => (
+                            <motion.div
+                                key={item.path}
                                 whileHover={{ x: 5 }}
-                                className="text-gray-600 hover:text-black transition duration-300"
                             >
-                                {item}
-                            </motion.a>
+                                <Link 
+                                    to={item.path}
+                                    onClick={handleLinkClick}
+                                    className="text-gray-600 hover:text-black transition duration-300"
+                                >
+                                    {item.label}
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    <motion.div 
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex flex-col space-y-2"
+                    >
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Links</h3>
+                        {[
+                            { label: 'Login', path: '/login' },
+                            { label: 'About Us', path: '/about' },
+                            { label: 'Contact', path: '/contact' }
+                        ].map((item) => (
+                            <motion.div
+                                key={item.path}
+                                whileHover={{ x: 5 }}
+                            >
+                                <Link 
+                                    to={item.path}
+                                    onClick={handleLinkClick}
+                                    className="text-gray-600 hover:text-black transition duration-300"
+                                >
+                                    {item.label}
+                                </Link>
+                            </motion.div>
                         ))}
                     </motion.div>
 

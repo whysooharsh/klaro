@@ -572,7 +572,7 @@ export default function Homepage() {
             <input 
               type="email" 
               placeholder="Your email address" 
-              className="px-6 py-3 rounded-full text-black focus:outline-none focus:ring-2 focus:ring-blue-300 w-full sm:w-auto"
+              className="px-6 py-3 rounded-full border-2 border-white text-white focus:outline-none focus:ring-2 focus:ring-blue-300 w-full sm:w-auto"
             />
             <motion.button 
               whileHover={{ scale: 1.05 }}

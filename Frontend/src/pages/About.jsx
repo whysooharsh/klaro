@@ -22,7 +22,7 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+    
       <div className="relative bg-indigo-600 py-24">
         <div className="absolute inset-0">
           <img
@@ -48,7 +48,6 @@ const About = () => {
         </div>
       </div>
 
-      {/* Mission Section */}
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -109,7 +108,6 @@ const About = () => {
         </div>
       </div>
 
-      {/* Team Section */}
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div

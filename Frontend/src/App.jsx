@@ -6,6 +6,13 @@ import Wishlist from './pages/wishlist';
 import Cart from './pages/cart';
 import Profile from './pages/profile';
 import Homepage from './pages/Homepage';
+import AllProducts from './pages/AllProducts';
+import Login from './pages/login';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
+import SizeGuide from './pages/SizeGuide';
+import Terms from './pages/Terms';
 import './main.css';
 
 function App() {
@@ -20,6 +27,13 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/all-products" element={<AllProducts />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/size-guide" element={<SizeGuide />} />
+            <Route path="/terms" element={<Terms />} />
           </Routes>
         </div>
       </div>
