@@ -14,6 +14,7 @@ import FAQ from './pages/FAQ';
 import SizeGuide from './pages/SizeGuide';
 import Terms from './pages/Terms';
 import './main.css';
+import Api from "./pages/Api";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/faq" element={<FAQ />} />
             <Route path="/size-guide" element={<SizeGuide />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/tryon" element={<Api />} />
           </Routes>
         </div>
       </div>

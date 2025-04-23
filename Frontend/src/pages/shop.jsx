@@ -129,6 +129,14 @@ const Shop = () => {
               >
                 Chat with Assistant
               </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/tryon')}
+                className="px-4 py-2 bg-gradient-to-r from-pink-400 to-red-400 text-white rounded-lg hover:from-pink-500 hover:to-red-500 transition-colors shadow-lg"
+              >
+                Virtual Try-On
+              </motion.button>
             </div>
           </div>
         </div>
