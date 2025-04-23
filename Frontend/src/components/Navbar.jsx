@@ -16,6 +16,9 @@ const Navbar = () => {
     { path: '/profile', icon: FiUser, label: 'Profile' }
   ];
 
+
+
+  
   const isActive = (path) => {
     return location.pathname === path;
   };
