@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import ScrollZoomVideo from "../components/scrollZoom";
 import Footer from "../components/footer";
+import { useNavigate } from "react-router-dom";
 
 const containerVariants = {
   hidden: {},
@@ -31,32 +32,60 @@ const itemVariants = {
 const trendingProducts = [
   {
     id: 1,
-    name: "Oversized Cotton Tee",
-    price: "$49.99",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
+    name: "Floral Summer Dress",
+    price: "$89.99",
+    image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "New",
     discount: "20% OFF"
   },
   {
     id: 2,
-    name: "Slim Fit Jeans",
-    price: "$79.99",
-    image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    name: "Casual Blouse",
+    price: "$49.99",
+    image: "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Bestseller"
   },
   {
     id: 3,
-    name: "Linen Blend Shirt",
-    price: "$59.99",
-    image: "https://images.unsplash.com/photo-1618354691551-44de113f0164?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=715&q=80",
+    name: "High-Waisted Jeans",
+    price: "$79.99",
+    image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Limited"
   },
   {
     id: 4,
-    name: "Wool Blend Coat",
-    price: "$129.99",
-    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=736&q=80",
+    name: "Evening Gown",
+    price: "$199.99",
+    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Premium"
+  },
+  {
+    id: 5,
+    name: "Silk Wrap Dress",
+    price: "$129.99",
+    image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "New"
+  },
+  {
+    id: 6,
+    name: "Pleated Midi Skirt",
+    price: "$59.99",
+    image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "Premium"
+  },
+  {
+    id: 7,
+    name: "Off-Shoulder Blouse",
+    price: "$39.99",
+    image: "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "Bestseller"
+  },
+  {
+    id: 8,
+    name: "Maxi Sundress",
+    price: "$69.99",
+    image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "New"
   }
 ];
 
@@ -146,6 +175,7 @@ export default function Homepage() {
   const [timer, setTimer] = useState(0);
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const navigate = useNavigate();
   
 
   useEffect(() => {
@@ -171,24 +201,24 @@ export default function Homepage() {
 
       <motion.div 
         style={{ opacity }}
-        className="bg-blue-300 w-full flex flex-col justify-center items-center px-4 gap-10 py-20 relative overflow-hidden"
+        className="bg-gradient-to-r from-blue-600 to-purple-600 w-full flex flex-col justify-center items-center px-4 gap-10 py-32 relative overflow-hidden"
       >
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ repeat: Infinity, duration: 5 }}
-          className="absolute top-0 right-0 w-64 h-64 bg-blue-200 rounded-full filter blur-3xl opacity-50 -z-10"
+          className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full filter blur-3xl opacity-50 -z-10"
         />
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 7, delay: 1 }}
-          className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400 rounded-full filter blur-3xl opacity-30 -z-10"
+          className="absolute bottom-20 left-20 w-96 h-96 bg-purple-400 rounded-full filter blur-3xl opacity-30 -z-10"
         />
 
         <motion.div
           initial={{ opacity: 0, y: -40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="sm:text-xl md:text-2xl text-shadow-gray-400"
+          className="sm:text-xl md:text-2xl text-white text-shadow-lg"
         >
           TRENDS THAT TALK TO YOU
         </motion.div>
@@ -197,7 +227,7 @@ export default function Homepage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl sm:text-[4rem] md:text-[3rem] lg:text-[90px] font-semibold text-shadow-gray-600 max-w-7xl text-center"
+          className="text-xl sm:text-[4rem] md:text-[3rem] lg:text-[90px] font-bold text-white text-shadow-lg max-w-7xl text-center leading-tight"
         >
           Where style meets simplicity — Shop smarter, live better
         </motion.div>
@@ -206,7 +236,7 @@ export default function Homepage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-base sm:text-lg md:text-xl text-shadow-gray-300 max-w-2xl font-extralight text-center"
+          className="text-base sm:text-lg md:text-xl text-white/90 text-shadow-lg max-w-2xl font-light text-center"
         >
           Virtual try-ons, smart returns, viral trends<br />
           this isn't shopping, it's sorcery
@@ -216,7 +246,8 @@ export default function Homepage() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-white text-black px-6 py-3 rounded-full shadow-md font-medium hover:bg-blue-100 transition"
+            className="bg-white text-blue-600 px-8 py-4 rounded-full shadow-lg font-medium hover:bg-blue-50 transition text-lg"
+            onClick={() => navigate('/shop')}
           >
             Shop Now
           </motion.button>
@@ -224,7 +255,8 @@ export default function Homepage() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-full shadow-md font-medium hover:bg-white/10 transition"
+            className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-lg font-medium hover:bg-white/10 transition text-lg"
+            onClick={() => navigate('/collections')}
           >
             Explore Collections
           </motion.button>
@@ -244,7 +276,24 @@ export default function Homepage() {
           </motion.h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            {["Women", "Men", "Accessories", "New Arrivals"].map((category, idx) => (
+            {[
+              {
+                name: "Dresses",
+                image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+              },
+              {
+                name: "Tops",
+                image: "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+              },
+              {
+                name: "Bottoms",
+                image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+              },
+              {
+                name: "Outerwear",
+                image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+              }
+            ].map((category, idx) => (
               <motion.div 
                 key={idx}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -256,12 +305,12 @@ export default function Homepage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
                 <img 
-                  src={`https://source.unsplash.com/random/300x300/?fashion,${category}`} 
-                  alt={category}
+                  src={category.image}
+                  alt={category.name}
                   className="w-full h-full object-cover"
                 />
                 <h3 className="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-bold z-20">
-                  {category}
+                  {category.name}
                 </h3>
               </motion.div>
             ))}
@@ -282,6 +331,7 @@ export default function Homepage() {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               className="text-black border-b-2 border-black pb-1 hidden md:block"
+              onClick={() => navigate('/shop')}
             >
               View All Products →
             </motion.button>
@@ -297,12 +347,14 @@ export default function Homepage() {
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ y: -10 }}
                 className="group cursor-pointer"
+                onClick={() => navigate(`/shop?product=${product.id}`)}
               >
-                <div className="relative overflow-hidden rounded-xl mb-4">
+                <div className="relative overflow-hidden rounded-xl mb-4 h-[400px]">
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    loading="lazy"
                   />
                   {product.tag && (
                     <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-semibold rounded-full">
@@ -314,28 +366,6 @@ export default function Homepage() {
                       {product.discount}
                     </div>
                   )}
-                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 h-full transition-all duration-300">
-                    <div className="absolute bottom-12 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-all duration-300 flex justify-center space-x-2">
-                      <motion.button 
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="bg-white text-black p-2  rounded-full shadow-lg"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                      </motion.button>
-                      <motion.button 
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="bg-white text-black p-2 rounded-full shadow-lg"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                      </motion.button>
-                    </div>
-                  </div>
                 </div>
                 <h3 className="font-medium text-lg">{product.name}</h3>
                 <p className="text-lg font-bold mt-1">{product.price}</p>
@@ -348,6 +378,7 @@ export default function Homepage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-neutral-800 text-white px-5 py-3 rounded-full font-medium"
+              onClick={() => navigate('/shop')}
             >
               View All Products
             </motion.button>
@@ -501,7 +532,14 @@ export default function Homepage() {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {[...Array(6)].map((_, idx) => (
+            {[
+              "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+              "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+              "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+              "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+              "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+              "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+            ].map((image, idx) => (
               <motion.div 
                 key={idx}
                 initial={{ opacity: 0 }}
@@ -512,7 +550,7 @@ export default function Homepage() {
                 className="aspect-square overflow-hidden"
               >
                 <img 
-                  src={`https://source.unsplash.com/random/300x300/?fashion,outfit,${idx}`} 
+                  src={image}
                   alt="Instagram post" 
                   className="w-full h-full object-cover hover:brightness-75 transition"
                 />
@@ -522,7 +560,9 @@ export default function Homepage() {
           
           <div className="mt-8 text-center">
             <motion.a 
-              href="#" 
+              href="https://www.instagram.com/klaroclothing" 
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               className="text-black text-lg font-medium border-b-2 border-black pb-1"
             >
@@ -578,6 +618,7 @@ export default function Homepage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-full shadow-md font-medium mt-8 hover:from-pink-600 hover:to-purple-600 transition"
+                onClick={() => navigate('/shop?category=women')}
               >
                 Shop Women's Collection
               </motion.button>
