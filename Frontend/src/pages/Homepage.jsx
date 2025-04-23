@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import ScrollZoomVideo from "../components/scrollZoom";
 import { Policy } from "../components/Policy";
 import Footer from "../components/footer";
@@ -32,32 +33,60 @@ const itemVariants = {
 const trendingProducts = [
   {
     id: 1,
-    name: "Oversized Cotton Tee",
-    price: "$49.99",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
+    name: "Floral Summer Dress",
+    price: "$89.99",
+    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446",
     tag: "New",
     discount: "20% OFF"
   },
   {
     id: 2,
-    name: "Slim Fit Jeans",
-    price: "$79.99",
-    image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    name: "Casual Blouse",
+    price: "$49.99",
+    image: "https://images.unsplash.com/photo-1551489186-cf8726f514f8",
     tag: "Bestseller"
   },
   {
     id: 3,
-    name: "Linen Blend Shirt",
-    price: "$59.99",
-    image: "https://images.unsplash.com/photo-1618354691551-44de113f0164?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=715&q=80",
+    name: "High-Waisted Jeans",
+    price: "$79.99",
+    image: "https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec",
     tag: "Limited"
   },
   {
     id: 4,
-    name: "Wool Blend Coat",
+    name: "Leather Handbag",
     price: "$129.99",
-    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=736&q=80",
+    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3",
     tag: "Premium"
+  },
+  {
+    id: 5,
+    name: "Ankle Boots",
+    price: "$99.99",
+    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2",
+    tag: "New"
+  },
+  {
+    id: 6,
+    name: "Evening Gown",
+    price: "$199.99",
+    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae",
+    tag: "Premium"
+  },
+  {
+    id: 7,
+    name: "Summer Hat",
+    price: "$39.99",
+    image: "https://images.unsplash.com/photo-1521369909029-2afed882baee",
+    tag: "Accessory"
+  },
+  {
+    id: 8,
+    name: "Designer Sunglasses",
+    price: "$149.99",
+    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083",
+    tag: "Luxury"
   }
 ];
 
@@ -142,11 +171,57 @@ const testimonials = [
   }
 ];
 
+const instagramPosts = [
+  {
+    id: 1,
+    image: "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg",
+    caption: "Summer Collection '24",
+    likes: 1234,
+    username: "@klarofashion"
+  },
+  {
+    id: 2,
+    image: "https://images.pexels.com/photos/2681751/pexels-photo-2681751.jpeg",
+    caption: "Street Style Essentials",
+    likes: 892,
+    username: "@klarostyle"
+  },
+  {
+    id: 3,
+    image: "https://images.pexels.com/photos/2866119/pexels-photo-2866119.jpeg",
+    caption: "Accessories Edit",
+    likes: 1567,
+    username: "@klaroaccessories"
+  },
+  {
+    id: 4,
+    image: "https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg",
+    caption: "Evening Wear Collection",
+    likes: 2103,
+    username: "@klarofashion"
+  },
+  {
+    id: 5,
+    image: "https://images.pexels.com/photos/2887767/pexels-photo-2887767.jpeg",
+    caption: "Casual Chic",
+    likes: 1876,
+    username: "@klarostyle"
+  },
+  {
+    id: 6,
+    image: "https://images.pexels.com/photos/2887768/pexels-photo-2887768.jpeg",
+    caption: "Weekend Vibes",
+    likes: 1432,
+    username: "@klarofashion"
+  }
+];
+
 export default function Homepage() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [timer, setTimer] = useState(0);
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const navigate = useNavigate();
   
 
   useEffect(() => {
@@ -158,6 +233,20 @@ export default function Homepage() {
     }, 1000);
     return () => clearInterval(interval);
   }, [timer, testimonials.length]);
+
+  const handleShopNow = () => {
+    // Navigate to shop page with a smooth scroll effect
+    navigate('/shop');
+    // You can also add analytics tracking here
+    console.log('Shop Now clicked');
+  };
+
+  const handleExploreCollections = () => {
+    // Navigate to shop page with a specific category filter
+    navigate('/shop?category=all');
+    // You can also add analytics tracking here
+    console.log('Explore Collections clicked');
+  };
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -198,38 +287,43 @@ export default function Homepage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl sm:text-[4rem] md:text-[3rem] lg:text-[90px] font-semibold text-shadow-gray-600 max-w-7xl text-center"
+          className="text-4xl md:text-6xl font-bold text-center"
         >
-          Where style meets simplicity — Shop smarter, live better
+          Discover Your Style
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-base sm:text-lg md:text-xl text-shadow-gray-300 max-w-2xl font-extralight text-center"
+          className="text-lg md:text-xl text-center max-w-2xl"
         >
-          Virtual try-ons, smart returns, viral trends<br />
-          this isn't shopping, it's sorcery
+          Explore our latest collection of trendy and sustainable fashion pieces
         </motion.div>
 
-        <div className="flex gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="flex flex-col sm:flex-row gap-4 mt-8"
+        >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-white text-black px-6 py-3 rounded-full shadow-md font-medium hover:bg-blue-100 transition"
+            onClick={handleShopNow}
+            className="bg-indigo-600 text-white px-8 py-3 rounded-md font-medium hover:bg-indigo-700 transition-colors duration-300"
           >
             Shop Now
           </motion.button>
-          
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-full shadow-md font-medium hover:bg-white/10 transition"
+            onClick={handleExploreCollections}
+            className="bg-white text-indigo-600 px-8 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors duration-300"
           >
             Explore Collections
           </motion.button>
-        </div>
+        </motion.div>
       </motion.div>
 
    
@@ -244,8 +338,21 @@ export default function Homepage() {
             Shop by Category
           </motion.h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            {["Women", "Men", "Accessories", "New Arrivals"].map((category, idx) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+            {[
+              {
+                name: "Dresses",
+                image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+              },
+              {
+                name: "Tops",
+                image: "https://images.unsplash.com/photo-1551489186-cf8726f514f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+              },
+              {
+                name: "Accessories",
+                image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+              }
+            ].map((category, idx) => (
               <motion.div 
                 key={idx}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -257,12 +364,12 @@ export default function Homepage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
                 <img 
-                  src={`https://source.unsplash.com/random/300x300/?fashion,${category}`} 
-                  alt={category}
+                  src={category.image}
+                  alt={category.name}
                   className="w-full h-full object-cover"
                 />
                 <h3 className="absolute bottom-4 left-0 right-0 text-center text-white text-xl font-bold z-20">
-                  {category}
+                  {category.name}
                 </h3>
               </motion.div>
             ))}
@@ -282,6 +389,7 @@ export default function Homepage() {
             <h2 className="text-3xl md:text-4xl font-bold">Trending Now</h2>
             <motion.button 
               whileHover={{ scale: 1.05 }}
+              onClick={() => navigate('/all-products')}
               className="text-black border-b-2 border-black pb-1 hidden md:block"
             >
               View All Products →
@@ -304,6 +412,10 @@ export default function Homepage() {
                     src={product.image} 
                     alt={product.name}
                     className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition duration-500"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/400x500?text=Product+Image";
+                    }}
                   />
                   {product.tag && (
                     <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-semibold rounded-full">
@@ -320,7 +432,7 @@ export default function Homepage() {
                       <motion.button 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="bg-white text-black p-2  rounded-full shadow-lg"
+                        className="bg-white text-black p-2 rounded-full shadow-lg"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -348,6 +460,7 @@ export default function Homepage() {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/all-products')}
               className="bg-neutral-800 text-white px-5 py-3 rounded-full font-medium"
             >
               View All Products
@@ -498,36 +611,52 @@ export default function Homepage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Follow Us on Instagram</h2>
-            <p className="text-gray-600 text-center max-w-2xl">Get inspired by our community and share your style with #laroStyle</p>
+            <p className="text-gray-600 text-center max-w-2xl">Get inspired by our community and share your style with #KlaroStyle</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {[...Array(6)].map((_, idx) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {instagramPosts.map((post, idx) => (
               <motion.div 
-                key={idx}
+                key={post.id}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.05 }}
-                whileHover={{ scale: 1.05 }}
-                className="aspect-square overflow-hidden"
+                transition={{ delay: idx * 0.1 }}
+                className="group relative aspect-square overflow-hidden rounded-lg cursor-pointer"
               >
                 <img 
-                  src={`https://source.unsplash.com/random/300x300/?fashion,outfit,${idx}`} 
-                  alt="Instagram post" 
-                  className="w-full h-full object-cover hover:brightness-75 transition"
+                  src={post.image} 
+                  alt={post.caption}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100">
+                  <p className="text-white font-medium text-sm mb-2">{post.caption}</p>
+                  <div className="flex items-center space-x-3">
+                    <span className="flex items-center text-white">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
+                      </svg>
+                      {post.likes.toLocaleString()}
+                    </span>
+                  </div>
+                  <p className="text-white text-xs mt-2">{post.username}</p>
+                </div>
               </motion.div>
             ))}
           </div>
           
           <div className="mt-8 text-center">
             <motion.a 
-              href="#" 
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
-              className="text-black text-lg font-medium border-b-2 border-black pb-1"
+              className="text-black text-lg font-medium border-b-2 border-black pb-1 inline-flex items-center"
             >
               @Klaroclothing
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </motion.a>
           </div>
         </div>
