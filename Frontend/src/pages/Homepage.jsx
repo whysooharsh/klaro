@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import ScrollZoomVideo from "../components/scrollZoom";
 import Footer from "../components/footer";
 import { useNavigate } from "react-router-dom";
@@ -170,6 +171,51 @@ const testimonials = [
   }
 ];
 
+const instagramPosts = [
+  {
+    id: 1,
+    image: "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg",
+    caption: "Summer Collection '24",
+    likes: 1234,
+    username: "@klarofashion"
+  },
+  {
+    id: 2,
+    image: "https://images.pexels.com/photos/2681751/pexels-photo-2681751.jpeg",
+    caption: "Street Style Essentials",
+    likes: 892,
+    username: "@klarostyle"
+  },
+  {
+    id: 3,
+    image: "https://images.pexels.com/photos/2866119/pexels-photo-2866119.jpeg",
+    caption: "Accessories Edit",
+    likes: 1567,
+    username: "@klaroaccessories"
+  },
+  {
+    id: 4,
+    image: "https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg",
+    caption: "Evening Wear Collection",
+    likes: 2103,
+    username: "@klarofashion"
+  },
+  {
+    id: 5,
+    image: "https://images.pexels.com/photos/2887767/pexels-photo-2887767.jpeg",
+    caption: "Casual Chic",
+    likes: 1876,
+    username: "@klarostyle"
+  },
+  {
+    id: 6,
+    image: "https://images.pexels.com/photos/2887768/pexels-photo-2887768.jpeg",
+    caption: "Weekend Vibes",
+    likes: 1432,
+    username: "@klarofashion"
+  }
+];
+
 export default function Homepage() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [timer, setTimer] = useState(0);
@@ -187,6 +233,20 @@ export default function Homepage() {
     }, 1000);
     return () => clearInterval(interval);
   }, [timer, testimonials.length]);
+
+  const handleShopNow = () => {
+    // Navigate to shop page with a smooth scroll effect
+    navigate('/shop');
+    // You can also add analytics tracking here
+    console.log('Shop Now clicked');
+  };
+
+  const handleExploreCollections = () => {
+    // Navigate to shop page with a specific category filter
+    navigate('/shop?category=all');
+    // You can also add analytics tracking here
+    console.log('Explore Collections clicked');
+  };
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -229,20 +289,24 @@ export default function Homepage() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl sm:text-[4rem] md:text-[3rem] lg:text-[90px] font-bold text-white text-shadow-lg max-w-7xl text-center leading-tight"
         >
-          Where style meets simplicity — Shop smarter, live better
+          Discover Your Style
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-base sm:text-lg md:text-xl text-white/90 text-shadow-lg max-w-2xl font-light text-center"
         >
-          Virtual try-ons, smart returns, viral trends<br />
-          this isn't shopping, it's sorcery
+          Explore our latest collection of trendy and sustainable fashion pieces
         </motion.div>
 
-        <div className="flex gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="flex flex-col sm:flex-row gap-4 mt-8"
+        >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -251,7 +315,6 @@ export default function Homepage() {
           >
             Shop Now
           </motion.button>
-          
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -260,7 +323,7 @@ export default function Homepage() {
           >
             Explore Collections
           </motion.button>
-        </div>
+        </motion.div>
       </motion.div>
 
    
@@ -330,6 +393,7 @@ export default function Homepage() {
             <h2 className="text-3xl md:text-4xl font-bold">Trending Now</h2>
             <motion.button 
               whileHover={{ scale: 1.05 }}
+              onClick={() => navigate('/all-products')}
               className="text-black border-b-2 border-black pb-1 hidden md:block"
               onClick={() => navigate('/shop')}
             >
@@ -377,6 +441,7 @@ export default function Homepage() {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/all-products')}
               className="bg-neutral-800 text-white px-5 py-3 rounded-full font-medium"
               onClick={() => navigate('/shop')}
             >
@@ -528,7 +593,7 @@ export default function Homepage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Follow Us on Instagram</h2>
-            <p className="text-gray-600 text-center max-w-2xl">Get inspired by our community and share your style with #laroStyle</p>
+            <p className="text-gray-600 text-center max-w-2xl">Get inspired by our community and share your style with #KlaroStyle</p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -541,19 +606,30 @@ export default function Homepage() {
               "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
             ].map((image, idx) => (
               <motion.div 
-                key={idx}
+                key={post.id}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.05 }}
-                whileHover={{ scale: 1.05 }}
-                className="aspect-square overflow-hidden"
+                transition={{ delay: idx * 0.1 }}
+                className="group relative aspect-square overflow-hidden rounded-lg cursor-pointer"
               >
                 <img 
                   src={image}
                   alt="Instagram post" 
                   className="w-full h-full object-cover hover:brightness-75 transition"
                 />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100">
+                  <p className="text-white font-medium text-sm mb-2">{post.caption}</p>
+                  <div className="flex items-center space-x-3">
+                    <span className="flex items-center text-white">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
+                      </svg>
+                      {post.likes.toLocaleString()}
+                    </span>
+                  </div>
+                  <p className="text-white text-xs mt-2">{post.username}</p>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -564,9 +640,12 @@ export default function Homepage() {
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
-              className="text-black text-lg font-medium border-b-2 border-black pb-1"
+              className="text-black text-lg font-medium border-b-2 border-black pb-1 inline-flex items-center"
             >
               @Klaroclothing
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </motion.a>
           </div>
         </div>
