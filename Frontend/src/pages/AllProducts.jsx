@@ -6,7 +6,7 @@ const products = [
     id: 1,
     name: "Floral Summer Dress",
     price: "$89.99",
-    image: "https://i.imgur.com/8tNPtLy.jpg",
+    image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "New",
     category: "Dresses",
     discount: "20% OFF"
@@ -15,7 +15,7 @@ const products = [
     id: 2,
     name: "Casual Blouse",
     price: "$49.99",
-    image: "https://i.imgur.com/qNOjJje.jpg",
+    image: "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Bestseller",
     category: "Tops"
   },
@@ -23,7 +23,7 @@ const products = [
     id: 3,
     name: "High-Waisted Jeans",
     price: "$79.99",
-    image: "https://i.imgur.com/XkHPUkW.jpg",
+    image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Limited",
     category: "Bottoms"
   },
@@ -31,7 +31,7 @@ const products = [
     id: 4,
     name: "Leather Handbag",
     price: "$129.99",
-    image: "https://i.imgur.com/ZmqQI1p.jpg",
+    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Premium",
     category: "Accessories"
   },
@@ -39,7 +39,7 @@ const products = [
     id: 5,
     name: "Ankle Boots",
     price: "$99.99",
-    image: "https://i.imgur.com/YHqVNeV.jpg",
+    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "New",
     category: "Shoes"
   },
@@ -47,7 +47,7 @@ const products = [
     id: 6,
     name: "Evening Gown",
     price: "$199.99",
-    image: "https://i.imgur.com/Q5qTQlQ.jpg",
+    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Premium",
     category: "Dresses"
   },
@@ -55,7 +55,7 @@ const products = [
     id: 7,
     name: "Summer Hat",
     price: "$39.99",
-    image: "https://i.imgur.com/VkjWKVj.jpg",
+    image: "https://images.unsplash.com/photo-1511231115599-3edad51208c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Accessory",
     category: "Accessories"
   },
@@ -63,7 +63,7 @@ const products = [
     id: 8,
     name: "Designer Sunglasses",
     price: "$149.99",
-    image: "https://i.imgur.com/2LSxgOh.jpg",
+    image: "https://images.unsplash.com/photo-1577803645773-f96470509666?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     tag: "Luxury",
     category: "Accessories"
   },
@@ -71,84 +71,84 @@ const products = [
     id: 9,
     name: "Silk Scarf",
     price: "$45.99",
-    image: "https://i.imgur.com/nZnWUc8.jpg",
+    image: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Accessories"
   },
   {
     id: 10,
     name: "Maxi Dress",
     price: "$119.99",
-    image: "https://i.imgur.com/L6o73Jt.jpg",
+    image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Dresses"
   },
   {
     id: 11,
     name: "Leather Jacket",
     price: "$199.99",
-    image: "https://i.imgur.com/dV3kXHk.jpg",
+    image: "https://images.unsplash.com/photo-1551794840-8ae3b9c814e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Outerwear"
   },
   {
     id: 12,
     name: "Pleated Skirt",
     price: "$69.99",
-    image: "https://i.imgur.com/wXuQ5hM.jpg",
+    image: "https://images.unsplash.com/photo-1577900232427-18219b9166a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Bottoms"
   },
   {
     id: 13,
     name: "Boho Style Dress",
     price: "$129.99",
-    image: "https://i.imgur.com/JxPXBrJ.jpg",
+    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Dresses"
   },
   {
     id: 14,
     name: "Classic White Shirt",
     price: "$59.99",
-    image: "https://i.imgur.com/UW3WPPp.jpg",
+    image: "https://images.unsplash.com/photo-1562572159-4efc207f5aff?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Tops"
   },
   {
     id: 15,
     name: "Statement Necklace",
     price: "$79.99",
-    image: "https://i.imgur.com/Y8m8LgF.jpg",
+    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Accessories"
   },
   {
     id: 16,
     name: "Cocktail Dress",
     price: "$159.99",
-    image: "https://i.imgur.com/v7KPMs3.jpg",
+    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Dresses"
   },
   {
     id: 17,
     name: "Tote Bag",
     price: "$89.99",
-    image: "https://i.imgur.com/ZFQUxGE.jpg",
+    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Accessories"
   },
   {
     id: 18,
     name: "Summer Sandals",
     price: "$69.99",
-    image: "https://i.imgur.com/kWq3UzX.jpg",
+    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Shoes"
   },
   {
     id: 19,
     name: "Printed Blouse",
     price: "$54.99",
-    image: "https://i.imgur.com/RzHtZdP.jpg",
+    image: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Tops"
   },
   {
     id: 20,
     name: "Denim Jacket",
     price: "$89.99",
-    image: "https://i.imgur.com/NkZF9h7.jpg",
+    image: "https://images.unsplash.com/photo-1543076447-215ad9ba6923?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Outerwear"
   }
 ];
