@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ScrollZoomVideo from "../components/scrollZoom";
-import { Policy } from "../components/Policy";
 import Footer from "../components/footer";
 
 const containerVariants = {
