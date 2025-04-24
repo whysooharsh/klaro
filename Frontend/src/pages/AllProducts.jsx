@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Virtuoso } from 'react-virtuoso';
+import Loading from '../components/Loading';
 
 const products = [
   {
@@ -160,6 +161,30 @@ const categories = ["All", "Dresses", "Tops", "Bottoms", "Accessories", "Shoes",
 
 // Separate ProductCard component for better performance
 const ProductCard = React.memo(({ product, onAddToCart, index }) => {
+  const { cart, wishlist, addToWishlist, removeFromWishlist } = useAuth();
+  
+  // Get quantity of this product in cart
+  const cartQuantity = useMemo(() => {
+    const cartItem = cart.find(item => item.id === product.id);
+    return cartItem ? cartItem.quantity : 0;
+  }, [cart, product.id]);
+
+  // Check if product is in wishlist
+  const isInWishlist = useMemo(() => {
+    return wishlist.some(item => item.id === product.id);
+  }, [wishlist, product.id]);
+
+  const handleWishlistToggle = (e) => {
+    e.stopPropagation();
+    if (isInWishlist) {
+      removeFromWishlist(product.id);
+      toast.success(`${product.name} removed from wishlist!`);
+    } else {
+      addToWishlist(product);
+      toast.success(`${product.name} added to wishlist!`);
+    }
+  };
+
   return (
     <motion.div
       key={product.id}
@@ -169,7 +194,7 @@ const ProductCard = React.memo(({ product, onAddToCart, index }) => {
         duration: 0.3,
         delay: Math.min(index * 0.1, 1) // Cap maximum delay at 1 second
       }}
-      className="group cursor-pointer"
+      className="group cursor-pointer relative"
       layout
     >
       <div className="relative overflow-hidden rounded-xl mb-4 h-[400px] bg-gray-50">
@@ -197,17 +222,31 @@ const ProductCard = React.memo(({ product, onAddToCart, index }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-3">
             <button
-              className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+              className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors relative"
               onClick={(e) => onAddToCart(product, e)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
+              {cartQuantity > 0 && (
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartQuantity}
+                </div>
+              )}
             </button>
             <button
-              className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+              className={`bg-white p-3 rounded-full shadow-lg transition-colors ${
+                isInWishlist ? 'text-red-500 hover:bg-red-50' : 'text-black hover:bg-gray-100'
+              }`}
+              onClick={handleWishlistToggle}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5" 
+                fill={isInWishlist ? "currentColor" : "none"} 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </button>
@@ -223,7 +262,17 @@ const ProductCard = React.memo(({ product, onAddToCart, index }) => {
 export default function AllProducts() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("default");
-  const { addToCart } = useCart();
+  const [isLoading, setIsLoading] = useState(true);
+  const { addToCart } = useAuth();
+
+  useEffect(() => {
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAddToCart = useCallback((product, e) => {
     e.stopPropagation();
@@ -245,6 +294,10 @@ export default function AllProducts() {
     }
     return filtered;
   }, [selectedCategory, sortBy]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-white">

@@ -2,20 +2,30 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FiShoppingBag, FiHome, FiHeart, FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { cart } = useAuth();
+
+  const getCartItemsCount = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
 
   const navItems = [
     { path: '/', icon: FiHome, label: 'Home' },
     { path: '/shop', icon: FiShoppingBag, label: 'Shop' },
     { path: '/wishlist', icon: FiHeart, label: 'Wishlist' },
-    { path: '/cart', icon: FiShoppingCart, label: 'Cart' },
+    { 
+      path: '/cart', 
+      icon: FiShoppingCart, 
+      label: 'Cart',
+      badge: getCartItemsCount()
+    },
     { path: '/profile', icon: FiUser, label: 'Profile' }
   ];
-
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -48,13 +58,20 @@ const Navbar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-1 ${
+                  className={`flex items-center space-x-1 relative ${
                     isActive(item.path)
                       ? 'text-blue-500'
                       : 'text-gray-700 hover:text-blue-500'
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <div className="relative">
+                    <Icon className="h-5 w-5" />
+                    {item.badge > 0 && item.path === '/cart' && (
+                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        {item.badge}
+                      </div>
+                    )}
+                  </div>
                   <span>{item.label}</span>
                 </Link>
               );
@@ -88,13 +105,20 @@ const Navbar = () => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={` px-3 py-2 rounded-md flex items-center space-x-2 ${
+                  className={`px-3 py-2 rounded-md flex items-center space-x-2 relative ${
                     isActive(item.path)
                       ? 'bg-blue-50 text-blue-500'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <div className="relative">
+                    <Icon className="h-5 w-5" />
+                    {item.badge > 0 && item.path === '/cart' && (
+                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        {item.badge}
+                      </div>
+                    )}
+                  </div>
                   <span>{item.label}</span>
                 </Link>
               );
