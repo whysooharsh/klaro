@@ -85,7 +85,7 @@ const trendingProducts = [
     id: 8,
     name: "Maxi Sundress",
     price: "$69.99",
-    image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://imgs.search.brave.com/rERpjookOnjTqBAqCD-2ZDnV9jD7BJnImfc-l8H9DnY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NjFKNDNvZjJKMkwu/anBn",
     tag: "New"
   }
 ];
@@ -223,6 +223,12 @@ export default function Homepage() {
   const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
   const navigate = useNavigate();
   
+  // Add parallax effects for hero section
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const y3 = useTransform(scrollYProgress, [0, 1], [0, -250]);
+  const scale = useTransform(scrollYProgress, [0, 0.3], [1, 0.85]);
+  const rotate = useTransform(scrollYProgress, [0, 0.3], [0, -5]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -235,16 +241,12 @@ export default function Homepage() {
   }, [timer, testimonials.length]);
 
   const handleShopNow = () => {
-    // Navigate to shop page with a smooth scroll effect
     navigate('/shop');
-    // You can also add analytics tracking here
     console.log('Shop Now clicked');
   };
 
   const handleExploreCollections = () => {
-    // Navigate to shop page with a specific category filter
     navigate('/shop?category=all');
-    // You can also add analytics tracking here
     console.log('Explore Collections clicked');
   };
 
@@ -260,68 +262,295 @@ export default function Homepage() {
       </motion.div>
 
       <motion.div 
-        style={{ opacity }}
+        style={{ opacity, scale }}
         className="bg-gradient-to-r from-blue-600 to-purple-600 w-full flex flex-col justify-center items-center px-4 gap-10 py-32 relative overflow-hidden"
       >
+        {/* Animated background elements */}
         <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ repeat: Infinity, duration: 5 }}
-          className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full filter blur-3xl opacity-50 -z-10"
+          animate={{ 
+            y: [0, -30, 0],
+            scale: [1, 1.2, 1],
+            rotate: [0, 10, 0]
+          }}
+          transition={{ 
+            repeat: Infinity, 
+            duration: 8,
+            ease: "easeInOut"
+          }}
+          className="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full filter blur-3xl opacity-50 -z-10"
         />
         <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 7, delay: 1 }}
+          animate={{ 
+            y: [0, 40, 0],
+            scale: [1, 1.4, 1],
+            rotate: [0, -15, 0]
+          }}
+          transition={{ 
+            repeat: Infinity, 
+            duration: 10,
+            ease: "easeInOut"
+          }}
           className="absolute bottom-20 left-20 w-96 h-96 bg-purple-400 rounded-full filter blur-3xl opacity-30 -z-10"
         />
-
+        
+        {/* New floating elements */}
         <motion.div
+          animate={{ 
+            x: [0, 40, 0],
+            y: [0, -40, 0],
+            rotate: [0, 20, 0]
+          }}
+          transition={{ 
+            repeat: Infinity, 
+            duration: 15,
+            ease: "easeInOut"
+          }}
+          className="absolute top-40 left-20 w-32 h-32 bg-pink-400 rounded-full filter blur-3xl opacity-20 -z-10"
+        />
+        <motion.div
+          animate={{ 
+            x: [0, -30, 0],
+            y: [0, 30, 0],
+            rotate: [0, -15, 0]
+          }}
+          transition={{ 
+            repeat: Infinity, 
+            duration: 12,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-40 right-20 w-64 h-64 bg-indigo-400 rounded-full filter blur-3xl opacity-20 -z-10"
+        />
+
+        {/* Enhanced text animations */}
+        <motion.div
+          style={{ y: y1 }}
           initial={{ opacity: 0, y: -40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="sm:text-xl md:text-2xl text-white text-shadow-lg"
+          animate={{ 
+            opacity: 1, 
+            y: 0,
+            textShadow: ["0px 0px 8px rgba(255,255,255,0.5)", "0px 0px 16px rgba(255,255,255,0.8)", "0px 0px 8px rgba(255,255,255,0.5)"]
+          }}
+          transition={{ 
+            duration: 1.2, 
+            delay: 0.2,
+            textShadow: {
+              repeat: Infinity,
+              duration: 3
+            }
+          }}
+          className="sm:text-xl md:text-2xl text-white font-light tracking-widest"
         >
           TRENDS THAT TALK TO YOU
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl sm:text-[4rem] md:text-[3rem] lg:text-[90px] font-bold text-white text-shadow-lg max-w-7xl text-center leading-tight"
+          style={{ y: y2 }}
+          initial={{ opacity: 0, y: -20, rotateX: 90 }}
+          animate={{ 
+            opacity: 1, 
+            y: 0, 
+            rotateX: 0,
+            textShadow: ["0px 0px 10px rgba(255,255,255,0.3)", "0px 0px 20px rgba(255,255,255,0.6)", "0px 0px 10px rgba(255,255,255,0.3)"]
+          }}
+          transition={{ 
+            type: "spring",
+            stiffness: 50,
+            damping: 20,
+            delay: 0.6,
+            textShadow: {
+              repeat: Infinity,
+              duration: 4
+            }
+          }}
+          className="text-xl sm:text-[4rem] md:text-[3rem] lg:text-[90px] font-bold text-white text-shadow-lg max-w-7xl text-center leading-tight relative"
         >
-          Discover Your Style
+          <motion.span
+            initial={{ opacity: 0, filter: "blur(10px)" }}
+            animate={{ 
+              opacity: 1, 
+              filter: "blur(0px)",
+              color: ["#fff", "#ffbfdd", "#fff"]
+            }}
+            transition={{ 
+              duration: 2,
+              delay: 0.8,
+              color: {
+                repeat: Infinity,
+                duration: 5
+              }
+            }}
+          >
+            Discover
+          </motion.span>{" "}
+          <motion.span
+            initial={{ opacity: 0, filter: "blur(10px)" }}
+            animate={{ 
+              opacity: 1, 
+              filter: "blur(0px)",
+              color: ["#fff", "#c3b1ff", "#fff"]
+            }}
+            transition={{ 
+              duration: 2,
+              delay: 1.2,
+              color: {
+                repeat: Infinity,
+                duration: 5,
+                delay: 1
+              }
+            }}
+          >
+            Your
+          </motion.span>{" "}
+          <motion.span
+            initial={{ opacity: 0, filter: "blur(10px)" }}
+            animate={{ 
+              opacity: 1, 
+              filter: "blur(0px)",
+              color: ["#fff", "#a6e3ff", "#fff"]
+            }}
+            transition={{ 
+              duration: 2,
+              delay: 1.6,
+              color: {
+                repeat: Infinity,
+                duration: 5,
+                delay: 2
+              }
+            }}
+          >
+            Style
+          </motion.span>
+          
+          {/* Decorative elements around the heading */}
+          <motion.div
+            className="absolute -right-5 -top-10 opacity-70"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ 
+              opacity: [0.4, 0.7, 0.4], 
+              scale: 1,
+              rotate: [0, 360]
+            }}
+            transition={{ 
+              duration: 20,
+              delay: 2,
+              opacity: {
+                repeat: Infinity,
+                duration: 3
+              },
+              rotate: {
+                repeat: Infinity,
+                duration: 20,
+                ease: "linear"
+              }
+            }}
+          >
+            ✨
+          </motion.div>
+          <motion.div
+            className="absolute -left-5 bottom-0 opacity-70"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ 
+              opacity: [0.4, 0.7, 0.4], 
+              scale: 1,
+              rotate: [0, -360]
+            }}
+            transition={{ 
+              duration: 20,
+              delay: 2.2,
+              opacity: {
+                repeat: Infinity,
+                duration: 4
+              },
+              rotate: {
+                repeat: Infinity,
+                duration: 25,
+                ease: "linear"
+              }
+            }}
+          >
+            ✨
+          </motion.div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          style={{ y: y3 }}
+          initial={{ opacity: 0, y: -20, scale: 0.9 }}
+          animate={{ 
+            opacity: 1, 
+            y: 0, 
+            scale: 1,
+            filter: ["drop-shadow(0px 0px 0px rgba(255,255,255,0))", "drop-shadow(0px 0px 5px rgba(255,255,255,0.5))", "drop-shadow(0px 0px 0px rgba(255,255,255,0))"]
+          }}
+          transition={{ 
+            duration: 1.2, 
+            delay: 1.8,
+            filter: {
+              repeat: Infinity,
+              duration: 4
+            }
+          }}
           className="text-base sm:text-lg md:text-xl text-white/90 text-shadow-lg max-w-2xl font-light text-center"
         >
           Explore our latest collection of trendy and sustainable fashion pieces
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 50,
+            damping: 20,
+            delay: 2.2 
+          }}
           className="flex flex-col sm:flex-row gap-4 mt-8"
         >
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ 
+              scale: 1.05, 
+              boxShadow: "0px 0px 15px rgba(255,255,255,0.5)" 
+            }}
             whileTap={{ scale: 0.95 }}
+            animate={{
+              boxShadow: ["0px 0px 0px rgba(255,255,255,0)", "0px 0px 10px rgba(255,255,255,0.3)", "0px 0px 0px rgba(255,255,255,0)"]
+            }}
+            transition={{
+              boxShadow: {
+                repeat: Infinity,
+                duration: 3
+              }
+            }}
             className="bg-white text-blue-600 px-8 py-4 rounded-full shadow-lg font-medium hover:bg-blue-50 transition text-lg"
             onClick={() => navigate('/shop')}
           >
             Shop Now
           </motion.button>
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ 
+              scale: 1.05, 
+              boxShadow: "0px 0px 15px rgba(255,255,255,0.5)" 
+            }}
             whileTap={{ scale: 0.95 }}
-            className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-lg font-medium hover:bg-white/10 transition text-lg"
+            animate={{
+              boxShadow: ["0px 0px 0px rgba(255,255,255,0)", "0px 0px 10px rgba(255,255,255,0.3)", "0px 0px 0px rgba(255,255,255,0)"]
+            }}
+            transition={{
+              boxShadow: {
+                repeat: Infinity,
+                duration: 3,
+                delay: 1.5
+              }
+            }}
+            className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-lg font-medium hover:bg-white/10 transition text-lg relative overflow-hidden group"
             onClick={() => navigate('/shop')}
           >
-            Explore Collections
+            <span className="relative z-10">Explore Collections</span>
+            <motion.div 
+              className="absolute inset-0 bg-white/10 -z-0" 
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "0%" }}
+              transition={{ duration: 0.4 }}
+            />
           </motion.button>
         </motion.div>
       </motion.div>
