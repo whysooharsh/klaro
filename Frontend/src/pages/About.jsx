@@ -29,6 +29,11 @@ const About = () => {
             className="w-full h-full object-cover opacity-20"
             src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
             alt="Fashion background"
+            loading="lazy"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "https://via.placeholder.com/1350x800/f5f5f5/333333?text=Fashion+Background";
+            }}
           />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,18 +127,25 @@ const About = () => {
             <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {teamMembers.map((member, index) => (
                 <motion.div
-                  key={member.name}
+                  key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 + index * 0.2 }}
-                  className="text-center"
+                  transition={{ delay: index * 0.2 }}
+                  className="bg-white p-6 rounded-lg shadow-lg text-center"
                 >
-                  <img
-                    className="mx-auto h-40 w-40 rounded-full object-cover"
-                    src={member.image}
-                    alt={member.name}
-                  />
-                  <h3 className="mt-6 text-lg font-medium text-gray-900">{member.name}</h3>
+                  <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://via.placeholder.com/128x128/f5f5f5/333333?text=${encodeURIComponent(member.name[0])}`;
+                      }}
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold">{member.name}</h3>
                   <p className="text-gray-600">{member.role}</p>
                 </motion.div>
               ))}

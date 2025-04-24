@@ -27,7 +27,16 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
          
           <Link to="/" className="flex items-center space-x-2">
-            <img src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" alt="Logo" className="h-10 w-10 rounded-xl" />
+            <img 
+              src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" 
+              alt="Logo" 
+              className="h-10 w-10 rounded-xl"
+              loading="lazy"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/40x40/f5f5f5/333333?text=Logo";
+              }}
+            />
             <span className="font-bold text-xl mr-4">laro</span>
           </Link>
 

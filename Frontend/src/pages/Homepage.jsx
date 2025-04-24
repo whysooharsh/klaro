@@ -647,6 +647,10 @@ export default function Homepage() {
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                     loading="lazy"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://via.placeholder.com/400x600/f5f5f5/333333?text=${encodeURIComponent(product.name)}`;
+                    }}
                   />
                   {product.tag && (
                     <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-semibold rounded-full">
@@ -699,7 +703,16 @@ export default function Homepage() {
                 transition={{ delay: idx * 0.1 }}
                 className="flex flex-col items-center text-center p-6 rounded-xl"
               >
-                <img src={feature.icon} alt={feature.title} className="w-16 h-16 mb-4" />
+                <img
+                  src={feature.icon}
+                  alt={feature.title}
+                  className="w-16 h-16 mx-auto mb-4"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://via.placeholder.com/64x64/f5f5f5/333333?text=Icon";
+                  }}
+                />
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
               </motion.div>
@@ -732,6 +745,11 @@ export default function Homepage() {
               src={item.image}
               alt={item.label}
               className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500 ease-in-out"
+              loading="lazy"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://via.placeholder.com/400x400/f5f5f5/333333?text=${encodeURIComponent(item.label)}`;
+              }}
             />
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition duration-300 flex items-center justify-center text-white font-bold text-xl opacity-0 group-hover:opacity-100">
               {item.label}
@@ -766,7 +784,16 @@ export default function Homepage() {
                 style={{ display: currentTestimonial === idx ? 'flex' : 'none' }}
               >
                 <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-4 border-blue-200">
-                  <img src={testimonial.image} alt={testimonial.name} className="w-full h-full object-cover" />
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://via.placeholder.com/64x64/f5f5f5/333333?text=${encodeURIComponent(testimonial.name[0])}`;
+                    }}
+                  />
                 </div>
                 <p className="text-xl italic mb-6">"{testimonial.text}"</p>
                 <h3 className="text-lg font-bold">{testimonial.name}</h3>
@@ -837,6 +864,11 @@ export default function Homepage() {
                   src={post.image}
                   alt="Instagram post" 
                   className="w-full h-full object-cover hover:brightness-75 transition"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://via.placeholder.com/400x400/f5f5f5/333333?text=Instagram+Post";
+                  }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100">
                   <p className="text-white font-medium text-sm mb-2">{post.caption}</p>

@@ -24,8 +24,17 @@ export default function Footer() {
                         className="flex flex-col space-y-4"
                     >
                         <div className="flex items-center">
-                            <img src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" alt="Logo" className="h-10 w-10 rounded-xl" />
-                            <span className="text-3xl font-bold text-gray-800 ">laro</span>
+                            <img 
+                                src="https://res.cloudinary.com/dpwqggym0/image/upload/c_thumb,w_200,g_face/v1745220359/logo_kkulrl.png" 
+                                alt="Logo" 
+                                className="h-10 w-10 rounded-xl"
+                                loading="lazy"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "https://via.placeholder.com/40x40/f5f5f5/333333?text=Logo";
+                                }}
+                            />
+                            <span className="text-3xl font-bold text-gray-800">laro</span>
                         </div>
                         <p className="text-gray-600 mt-4 max-w-xs">Redefining fashion with sustainable and stylish clothing for the modern individual.</p>
                         <div className="flex space-x-4 mt-4">
