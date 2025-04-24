@@ -86,8 +86,8 @@ const Profile = () => {
                   <FiCamera className="h-4 w-4 text-white" />
                 </motion.div>
               </div>
-              <h3 className="text-xl font-semibold text-center text-gray-100">Sarah Johnson</h3>
-              <p className="text-sm text-center text-gray-400">Member since 2023</p>
+              <h3 className="text-xl font-semibold text-center text-gray-100">Harsh Sharma</h3>
+              <p className="text-sm text-center text-gray-400">Member since 24/04/2025</p>
             </div>
             
             <nav className="px-4 py-6">
@@ -129,7 +129,6 @@ const Profile = () => {
             </nav>
           </motion.div>
           
-          {/* Main content */}
           <motion.div 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
