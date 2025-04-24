@@ -90,6 +90,37 @@ const trendingProducts = [
   }
 ];
 
+const mensFeaturedProducts = [
+  {
+    id: 1,
+    name: "Classic Fit Shirt",
+    price: "$59.99",
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "New",
+    discount: "15% OFF"
+  },
+  {
+    id: 2,
+    name: "Slim Fit Jeans",
+    price: "$79.99",
+    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "Bestseller"
+  },
+  {
+    id: 3,
+    name: "Casual Blazer",
+    price: "$129.99",
+    image: "https://images.unsplash.com/photo-1593032465175-481ac7f401a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "Premium"
+  },
+  {
+    id: 4,
+    name: "Leather Jacket",
+    price: "$199.99",
+    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    tag: "Limited"
+  }
+];
 
 const features = [
   {
@@ -248,6 +279,10 @@ export default function Homepage() {
   const handleExploreCollections = () => {
     navigate('/shop?category=all');
     console.log('Explore Collections clicked');
+  };
+
+  const handleMensCollection = () => {
+    navigate('/mens-products');
   };
 
   return (
@@ -997,6 +1032,69 @@ export default function Homepage() {
           </div>
         </div>
       </motion.div>
+
+      <div className="w-full py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl font-bold text-center mb-12"
+          >
+            Men's Collection
+          </motion.h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {mensFeaturedProducts.map((product, idx) => (
+              <motion.div 
+                key={product.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="group cursor-pointer"
+                onClick={() => navigate(`/product/${product.id}`)}
+              >
+                <div className="relative overflow-hidden rounded-xl mb-4 h-[400px]">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://via.placeholder.com/400x600/f5f5f5/333333?text=${encodeURIComponent(product.name)}`;
+                    }}
+                  />
+                  {product.tag && (
+                    <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-semibold rounded-full">
+                      {product.tag}
+                    </div>
+                  )}
+                  {product.discount && (
+                    <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-xs font-semibold rounded-full">
+                      {product.discount}
+                    </div>
+                  )}
+                </div>
+                <h3 className="font-medium text-lg">{product.name}</h3>
+                <p className="text-lg font-bold mt-1">{product.price}</p>
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleMensCollection}
+              className="bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition-colors"
+            >
+              View All Men's Collection
+            </motion.button>
+          </div>
+        </div>
+      </div>
+
       <Footer />
     </div>
   );

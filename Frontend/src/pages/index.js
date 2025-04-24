@@ -13,4 +13,6 @@ export { default as Terms } from './Terms';
 export { default as OrderConfirmation } from './OrderConfirmation';
 export { default as Api } from './Api';
 export { default as Signup } from './Signup';
-export { default as Checkout } from './Checkout'; 
+export { default as Checkout } from './Checkout';
+export { default as ProductDescription } from './ProductDescription';
+export { default as MensProducts } from './MensProducts'; 

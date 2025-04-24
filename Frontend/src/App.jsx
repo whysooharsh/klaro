@@ -17,7 +17,9 @@ import {
   OrderConfirmation,
   Api,
   Signup,
-  Checkout
+  Checkout,
+  ProductDescription,
+  MensProducts
 } from './pages';
 import './main.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -47,6 +49,8 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Homepage />} />
                   <Route path="/shop" element={<Shop />} />
+                  <Route path="/product/:id" element={<ProductDescription />} />
+                  <Route path="/mens-products" element={<MensProducts />} />
                   <Route path="/wishlist" element={<Wishlist />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route 

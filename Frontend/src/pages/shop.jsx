@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiSearch, FiShoppingCart, FiHeart, FiFilter, FiChevronDown, FiChevronUp, FiX } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiHeart, FiFilter, FiChevronDown, FiChevronUp, FiX, FiShare2 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { products as initialProducts } from '../data/products';
 import Chatbot from '../components/Chatbot';
@@ -21,6 +21,8 @@ const Shop = () => {
   const [highlightedProducts, setHighlightedProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [showOnlyHighlighted, setShowOnlyHighlighted] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   const filteredProducts = products
     .filter(product => {
@@ -78,6 +80,15 @@ const Shop = () => {
     setSearchQuery('');
     setShowOnlyHighlighted(false);
     setHighlightedProducts([]);
+  };
+
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setQuantity(1);
+  };
+
+  const handleCloseProductModal = () => {
+    setSelectedProduct(null);
   };
 
   return (
@@ -283,6 +294,7 @@ const Shop = () => {
                         ? 'ring-2 ring-blue-400 transform scale-105'
                         : 'hover:shadow-lg'
                     }`}
+                    onClick={() => handleProductClick(product)}
                   >
                     <motion.div 
                       className="relative"
@@ -296,7 +308,10 @@ const Shop = () => {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => handleAddToWishlist(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToWishlist(product);
+                        }}
                         className={`absolute top-2 right-2 p-2 rounded-full ${
                           wishlist.some(item => item.id === product.id)
                             ? 'bg-red-400 text-white'
@@ -315,7 +330,7 @@ const Shop = () => {
                       <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
                       <p className="text-blue-500 font-medium">${product.price}</p>
                       <p className="text-sm text-gray-600">Size: {product.size}</p>
-                      <p className="text-sm text-gray-600 mt-1">{product.description}</p>
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
                       <motion.div 
                         className="mt-4 flex space-x-2"
                         whileHover={{ scale: 1.02 }}
@@ -323,7 +338,10 @@ const Shop = () => {
                         <motion.button 
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => handleAddToCart(product)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(product);
+                          }}
                           className="flex-1 bg-gradient-to-r from-blue-400 to-purple-400 text-white py-2 rounded hover:from-blue-500 hover:to-purple-500 transition-colors shadow-lg"
                         >
                           Add to Cart
@@ -353,6 +371,132 @@ const Shop = () => {
           </div>
         </div>
       </div>
+
+      {/* Product Description Modal */}
+      <AnimatePresence>
+        {selectedProduct && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={handleCloseProductModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+                <div className="relative">
+                  <img
+                    src={selectedProduct.image}
+                    alt={selectedProduct.name}
+                    className="w-full h-[500px] object-cover rounded-lg"
+                  />
+                  {selectedProduct.tag && (
+                    <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-semibold rounded-full">
+                      {selectedProduct.tag}
+                    </div>
+                  )}
+                  {selectedProduct.discount && (
+                    <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-xs font-semibold rounded-full">
+                      {selectedProduct.discount}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedProduct.name}</h2>
+                  <p className="text-2xl font-semibold text-blue-500 mb-4">${selectedProduct.price}</p>
+                  <p className="text-gray-600 mb-6">{selectedProduct.description}</p>
+                  
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Size</h3>
+                    <div className="flex gap-2">
+                      {['S', 'M', 'L', 'XL'].map((size) => (
+                        <button
+                          key={size}
+                          className={`px-4 py-2 border rounded-lg ${
+                            selectedProduct.size === size
+                              ? 'border-blue-500 bg-blue-50 text-blue-500'
+                              : 'border-gray-200 hover:border-blue-500'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Quantity</h3>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="px-3 py-1 border rounded-lg hover:bg-gray-50"
+                      >
+                        -
+                      </button>
+                      <span className="text-lg font-medium">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="px-3 py-1 border rounded-lg hover:bg-gray-50"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 mb-6">
+                    <button
+                      onClick={() => {
+                        handleAddToCart({ ...selectedProduct, quantity });
+                        handleCloseProductModal();
+                      }}
+                      className="flex-1 bg-gradient-to-r from-blue-400 to-purple-400 text-white py-3 rounded-lg hover:from-blue-500 hover:to-purple-500 transition-colors flex items-center justify-center"
+                    >
+                      <FiShoppingCart className="mr-2" />
+                      Add to Cart
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleAddToWishlist(selectedProduct);
+                        handleCloseProductModal();
+                      }}
+                      className={`p-3 rounded-lg border ${
+                        wishlist.some(item => item.id === selectedProduct.id)
+                          ? 'border-red-500 text-red-500'
+                          : 'border-gray-200 hover:border-red-500 hover:text-red-500'
+                      }`}
+                    >
+                      <FiHeart />
+                    </button>
+                    <button className="p-3 rounded-lg border border-gray-200 hover:border-blue-500 hover:text-blue-500">
+                      <FiShare2 />
+                    </button>
+                  </div>
+
+                  <div className="mt-auto">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Tags</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {showChatbot && (
         <Chatbot
