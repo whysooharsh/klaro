@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useCart } from '../context/CartContext';
+import { toast } from 'react-hot-toast';
 
 const products = [
   {
     id: 1,
     name: "Floral Summer Dress",
     price: "$89.99",
-    image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/2058664/pexels-photo-2058664.jpeg",
     tag: "New",
     category: "Dresses",
     discount: "20% OFF"
@@ -15,7 +17,7 @@ const products = [
     id: 2,
     name: "Casual Blouse",
     price: "$49.99",
-    image: "https://images.unsplash.com/photo-1554568218-0f1715e72254?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://imgs.search.brave.com/Q3GqEmlnhl_1iI5OnLtqNqLlXpkB1Zd3yzuMxovQu_E/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS1jbGRucnkucy1u/YmNuZXdzLmNvbS9p/bWFnZS91cGxvYWQv/dF9maXQtMzIwdyxm/X2F1dG8scV9hdXRv/OmJlc3QvbmV3c2Nt/cy8yMDI0XzQzLzE5/ODY5OTEvNDFnaXBu/Zm1ueGwtc2w1MDAt/NjQ0MTU5NjM1ZjZh/My5qcGc",
     tag: "Bestseller",
     category: "Tops"
   },
@@ -23,7 +25,7 @@ const products = [
     id: 3,
     name: "High-Waisted Jeans",
     price: "$79.99",
-    image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1082529/pexels-photo-1082529.jpeg",
     tag: "Limited",
     category: "Bottoms"
   },
@@ -31,7 +33,7 @@ const products = [
     id: 4,
     name: "Leather Handbag",
     price: "$129.99",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/904350/pexels-photo-904350.jpeg",
     tag: "Premium",
     category: "Accessories"
   },
@@ -39,7 +41,7 @@ const products = [
     id: 5,
     name: "Ankle Boots",
     price: "$99.99",
-    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://www.charleskeith.in/dw/image/v2/BCWJ_PRD/on/demandware.static/-/Sites-in-products/default/dw4ae2b2d3/images/hi-res/2022-L6-CK1-90280042-05-8.jpg?sw=756&sh=1008",
     tag: "New",
     category: "Shoes"
   },
@@ -47,7 +49,7 @@ const products = [
     id: 6,
     name: "Evening Gown",
     price: "$199.99",
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1755428/pexels-photo-1755428.jpeg",
     tag: "Premium",
     category: "Dresses"
   },
@@ -55,7 +57,7 @@ const products = [
     id: 7,
     name: "Summer Hat",
     price: "$39.99",
-    image: "https://images.unsplash.com/photo-1511231115599-3edad51208c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1078975/pexels-photo-1078975.jpeg",
     tag: "Accessory",
     category: "Accessories"
   },
@@ -63,7 +65,7 @@ const products = [
     id: 8,
     name: "Designer Sunglasses",
     price: "$149.99",
-    image: "https://images.unsplash.com/photo-1577803645773-f96470509666?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/701877/pexels-photo-701877.jpeg",
     tag: "Luxury",
     category: "Accessories"
   },
@@ -71,84 +73,84 @@ const products = [
     id: 9,
     name: "Silk Scarf",
     price: "$45.99",
-    image: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/6764032/pexels-photo-6764032.jpeg",
     category: "Accessories"
   },
   {
     id: 10,
     name: "Maxi Dress",
     price: "$119.99",
-    image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1755385/pexels-photo-1755385.jpeg",
     category: "Dresses"
   },
   {
     id: 11,
     name: "Leather Jacket",
     price: "$199.99",
-    image: "https://images.unsplash.com/photo-1551794840-8ae3b9c814e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1124468/pexels-photo-1124468.jpeg",
     category: "Outerwear"
   },
   {
     id: 12,
     name: "Pleated Skirt",
     price: "$69.99",
-    image: "https://images.unsplash.com/photo-1577900232427-18219b9166a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1631181/pexels-photo-1631181.jpeg",
     category: "Bottoms"
   },
   {
     id: 13,
     name: "Boho Style Dress",
     price: "$129.99",
-    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/4946409/pexels-photo-4946409.jpeg",
     category: "Dresses"
   },
   {
     id: 14,
     name: "Classic White Shirt",
     price: "$59.99",
-    image: "https://images.unsplash.com/photo-1562572159-4efc207f5aff?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/6764007/pexels-photo-6764007.jpeg",
     category: "Tops"
   },
   {
     id: 15,
     name: "Statement Necklace",
     price: "$79.99",
-    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg",
     category: "Accessories"
   },
   {
     id: 16,
     name: "Cocktail Dress",
     price: "$159.99",
-    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://imgs.search.brave.com/iUTUMXSsvTMwjMzr0g2XtjLtq20AjhiU34wudM0lpC4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pLmV0/c3lzdGF0aWMuY29t/LzgwNjc0NTcvci9p/b9mMWY4NGUvMzEy/OTYzMjI3Ny9pbF82/MDB4NjAwLjMxMjk2/MzIyNzdfNXFpNi5q/cGc",
     category: "Dresses"
   },
   {
     id: 17,
     name: "Tote Bag",
     price: "$89.99",
-    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg",
     category: "Accessories"
   },
   {
     id: 18,
     name: "Summer Sandals",
     price: "$69.99",
-    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
     category: "Shoes"
   },
   {
     id: 19,
-    name: "Printed Blouse",
+    name: "Nigga",
     price: "$54.99",
-    image: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/6311158/pexels-photo-6311158.jpeg",
     category: "Tops"
   },
   {
     id: 20,
     name: "Denim Jacket",
     price: "$89.99",
-    image: "https://images.unsplash.com/photo-1543076447-215ad9ba6923?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg",
     category: "Outerwear"
   }
 ];
@@ -158,6 +160,13 @@ const categories = ["All", "Dresses", "Tops", "Bottoms", "Accessories", "Shoes",
 export default function AllProducts() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("default");
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (product, e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    addToCart(product);
+    toast.success(`${product.name} added to cart!`);
+  };
 
   const filteredProducts = products.filter(product => 
     selectedCategory === "All" ? true : product.category === selectedCategory
@@ -195,7 +204,7 @@ export default function AllProducts() {
         </div>
       </div>
 
-      {/* Filters Section */}
+   
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <div className="flex flex-wrap gap-2">
@@ -226,25 +235,27 @@ export default function AllProducts() {
           </select>
         </div>
 
-        {/* Products Grid */}
+      
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {sortedProducts.map((product, idx) => (
             <motion.div
               key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
               whileHover={{ y: -10 }}
               className="group cursor-pointer"
             >
-              <div className="relative overflow-hidden rounded-xl mb-4">
+              <div className="relative overflow-hidden rounded-xl mb-4 h-[400px] bg-gray-50">
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  loading="lazy"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/400x500?text=Product+Image";
+                    e.target.src = `https://via.placeholder.com/400x600/f5f5f5/333333?text=${encodeURIComponent(product.name)}`;
                   }}
                 />
                 {product.tag && (
@@ -257,12 +268,13 @@ export default function AllProducts() {
                     {product.discount}
                   </div>
                 )}
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 h-full transition-all duration-300">
-                  <div className="absolute bottom-4 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-all duration-300 flex justify-center space-x-2">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-3">
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="bg-white text-black p-2 rounded-full shadow-lg"
+                      className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100"
+                      onClick={(e) => handleAddToCart(product, e)}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -271,7 +283,7 @@ export default function AllProducts() {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="bg-white text-black p-2 rounded-full shadow-lg"
+                      className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />

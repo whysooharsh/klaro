@@ -17,8 +17,6 @@ const Navbar = () => {
   ];
 
 
-
-  
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -54,7 +52,6 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -69,7 +66,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <div
           className={`md:hidden ${
             isMobileMenuOpen ? 'block' : 'hidden'
@@ -83,7 +79,7 @@ const Navbar = () => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block px-3 py-2 rounded-md flex items-center space-x-2 ${
+                  className={` px-3 py-2 rounded-md flex items-center space-x-2 ${
                     isActive(item.path)
                       ? 'bg-blue-50 text-blue-500'
                       : 'text-gray-700 hover:bg-gray-100'
