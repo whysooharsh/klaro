@@ -429,7 +429,7 @@ const Shop = () => {
                       ))}
                     </div>
                   </div>
-
+                        {/* too much hassle */}
                   <div className="mb-6">
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Quantity</h3>
                     <div className="flex items-center gap-4">
