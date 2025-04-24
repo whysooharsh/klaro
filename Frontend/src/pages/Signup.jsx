@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiPhone } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
+const Signup = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
+    phone: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -18,12 +20,17 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    const result = login(formData);
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
+    const result = signup(formData);
     
     if (result.success) {
       navigate('/profile');
     } else {
-      setError(result.message || 'Invalid credentials');
+      setError(result.message || 'Error creating account');
     }
   };
 
@@ -49,7 +56,7 @@ const Login = () => {
             transition={{ delay: 0.2 }}
             className="mt-6 text-center text-3xl font-extrabold text-white"
           >
-            Welcome Back
+            Create Account
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -57,7 +64,7 @@ const Login = () => {
             transition={{ delay: 0.3 }}
             className="mt-2 text-center text-sm text-gray-400"
           >
-            Sign in to your account to continue
+            Join us and start shopping
           </motion.p>
         </div>
 
@@ -69,6 +76,23 @@ const Login = () => {
           onSubmit={handleSubmit}
         >
           <div className="rounded-md shadow-sm space-y-4">
+            <div className="relative">
+              <label htmlFor="name" className="sr-only">
+                Full Name
+              </label>
+              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-3 bg-gray-800 border border-gray-700 placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                placeholder="Full Name"
+              />
+            </div>
+
             <div className="relative">
               <label htmlFor="email" className="sr-only">
                 Email address
@@ -83,6 +107,23 @@ const Login = () => {
                 onChange={handleChange}
                 className="appearance-none relative block w-full pl-10 pr-3 py-3 bg-gray-800 border border-gray-700 placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                 placeholder="Email address"
+              />
+            </div>
+
+            <div className="relative">
+              <label htmlFor="phone" className="sr-only">
+                Phone Number
+              </label>
+              <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-3 bg-gray-800 border border-gray-700 placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                placeholder="Phone Number"
               />
             </div>
 
@@ -128,27 +169,17 @@ const Login = () => {
               type="submit"
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 shadow-[0_4px_14px_rgba(59,130,246,0.4)] transition-all"
             >
-              Sign in
+              Create Account
             </motion.button>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link
-                to="/forgot-password"
-                className="font-medium text-blue-400 hover:text-blue-300"
-              >
-                Forgot your password?
+          <div className="text-center">
+            <p className="text-sm text-gray-400">
+              Already have an account?{' '}
+              <Link to="/login" className="font-medium text-blue-400 hover:text-blue-300">
+                Sign in
               </Link>
-            </div>
-            <div className="text-sm">
-              <Link
-                to="/signup"
-                className="font-medium text-blue-400 hover:text-blue-300"
-              >
-                Create an account
-              </Link>
-            </div>
+            </p>
           </div>
         </motion.form>
       </motion.div>
@@ -156,4 +187,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup; 

@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { products as initialProducts } from '../data/products';
 import Chatbot from '../components/Chatbot';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const Shop = () => {
   const navigate = useNavigate();
+  const { addToCart, addToWishlist, cart, wishlist } = useAuth();
   const [products, setProducts] = useState(initialProducts);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
@@ -18,8 +20,6 @@ const Shop = () => {
   const [showChatbot, setShowChatbot] = useState(false);
   const [highlightedProducts, setHighlightedProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
-  const [wishlistItems, setWishlistItems] = useState([]);
   const [showOnlyHighlighted, setShowOnlyHighlighted] = useState(false);
 
   const filteredProducts = products
@@ -57,15 +57,11 @@ const Shop = () => {
   };
 
   const handleAddToCart = (product) => {
-    setCartItems([...cartItems, product]);
-    navigate('/cart');
+    addToCart(product);
   };
 
   const handleAddToWishlist = (product) => {
-    if (!wishlistItems.some(item => item.id === product.id)) {
-      setWishlistItems([...wishlistItems, product]);
-      navigate('/wishlist');
-    }
+    addToWishlist(product);
   };
 
   const getProductCount = (category) => {
@@ -302,7 +298,7 @@ const Shop = () => {
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleAddToWishlist(product)}
                         className={`absolute top-2 right-2 p-2 rounded-full ${
-                          wishlistItems.some(item => item.id === product.id)
+                          wishlist.some(item => item.id === product.id)
                             ? 'bg-red-400 text-white'
                             : 'bg-white/80 text-gray-700 hover:bg-red-400 hover:text-white'
                         } transition-colors`}
@@ -362,8 +358,8 @@ const Shop = () => {
         <Chatbot
           products={products}
           onProductRecommend={handleProductRecommendation}
-          cartItems={cartItems}
-          wishlistItems={wishlistItems}
+          cartItems={cart}
+          wishlistItems={wishlist}
         />
       )}
     </motion.div>

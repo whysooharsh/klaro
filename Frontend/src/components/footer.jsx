@@ -29,10 +29,17 @@ export default function Footer() {
                         </div>
                         <p className="text-gray-600 mt-4 max-w-xs">Redefining fashion with sustainable and stylish clothing for the modern individual.</p>
                         <div className="flex space-x-4 mt-4">
-                            {['facebook', 'twitter', 'instagram', 'pinterest'].map((social) => (
+                            {[
+                                { id: 'facebook', url: 'https://facebook.com' },
+                                { id: 'twitter', url: 'https://twitter.com' },
+                                { id: 'instagram', url: 'https://instagram.com' },
+                                { id: 'pinterest', url: 'https://pinterest.com' }
+                            ].map((social) => (
                                 <motion.a 
-                                    key={social} 
-                                    href="#" 
+                                    key={social.id} 
+                                    href={social.url} 
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     whileHover={{ y: -3, scale: 1.1 }}
                                     className="text-gray-600 hover:text-black"
                                 >
@@ -52,15 +59,25 @@ export default function Footer() {
                         className="flex flex-col space-y-2"
                     >
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Shop</h3>
-                        {['New Arrivals', 'Best Sellers', 'Special Offers', 'Women', 'Partners', 'Sale'].map((item) => (
-                            <motion.a 
-                                key={item} 
-                                href="#" 
+                        {[
+                            { id: 'new-arrivals', label: 'New Arrivals', path: '/shop/new-arrivals' },
+                            { id: 'best-sellers', label: 'Best Sellers', path: '/shop/best-sellers' },
+                            { id: 'special-offers', label: 'Special Offers', path: '/shop/special-offers' },
+                            { id: 'women', label: 'Women', path: '/shop/women' },
+                            { id: 'partners', label: 'Partners', path: '/shop/partners' },
+                            { id: 'sale', label: 'Sale', path: '/shop/sale' }
+                        ].map((item) => (
+                            <motion.div
+                                key={item.id}
                                 whileHover={{ x: 5 }}
-                                className="text-gray-600 hover:text-black transition duration-300"
                             >
-                                {item}
-                            </motion.a>
+                                <Link 
+                                    to={item.path}
+                                    className="text-gray-600 hover:text-black transition duration-300"
+                                >
+                                    {item.label}
+                                </Link>
+                            </motion.div>
                         ))}
                     </motion.div>
 
@@ -72,15 +89,15 @@ export default function Footer() {
                     >
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Support</h3>
                         {[
-                            { label: 'FAQ', path: '/faq' },
-                            { label: 'Shipping & Returns', path: '#' },
-                            { label: 'Contact Us', path: '/contact' },
-                            { label: 'Size Guide', path: '/size-guide' },
-                            { label: 'Privacy Policy', path: '#' },
-                            { label: 'Terms of Service', path: '/terms' }
+                            { id: 'faq', label: 'FAQ', path: '/faq' },
+                            { id: 'shipping', label: 'Shipping & Returns', path: '/shipping-returns' },
+                            { id: 'contact', label: 'Contact Us', path: '/contact' },
+                            { id: 'size-guide', label: 'Size Guide', path: '/size-guide' },
+                            { id: 'privacy', label: 'Privacy Policy', path: '/privacy-policy' },
+                            { id: 'terms', label: 'Terms of Service', path: '/terms' }
                         ].map((item) => (
                             <motion.div
-                                key={item.path}
+                                key={item.id}
                                 whileHover={{ x: 5 }}
                             >
                                 <Link 
@@ -102,12 +119,12 @@ export default function Footer() {
                     >
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Links</h3>
                         {[
-                            { label: 'Login', path: '/login' },
-                            { label: 'About Us', path: '/about' },
-                            { label: 'Contact', path: '/contact' }
+                            { id: 'login', label: 'Login', path: '/login' },
+                            { id: 'about', label: 'About Us', path: '/about' },
+                            { id: 'contact-quick', label: 'Contact', path: '/contact' }
                         ].map((item) => (
                             <motion.div
-                                key={item.path}
+                                key={item.id}
                                 whileHover={{ x: 5 }}
                             >
                                 <Link 
