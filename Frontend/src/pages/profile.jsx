@@ -172,7 +172,7 @@ const Profile = () => {
                           <input
                             type="text"
                             disabled={!isEditing}
-                            defaultValue="Sarah Johnson"
+                            defaultValue="Harsh Sharma"
                             className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                           />
                         </div>
@@ -187,7 +187,7 @@ const Profile = () => {
                           <input
                             type="email"
                             disabled={!isEditing}
-                            defaultValue="sarah.johnson@example.com"
+                            defaultValue="whysooharsh@gmail.com"
                             className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                           />
                         </div>
