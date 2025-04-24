@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-hot-toast';
+import { Virtuoso } from 'react-virtuoso';
 
 const products = [
   {
@@ -157,38 +158,102 @@ const products = [
 
 const categories = ["All", "Dresses", "Tops", "Bottoms", "Accessories", "Shoes", "Outerwear"];
 
+// Separate ProductCard component for better performance
+const ProductCard = React.memo(({ product, onAddToCart, index }) => {
+  return (
+    <motion.div
+      key={product.id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        duration: 0.3,
+        delay: Math.min(index * 0.1, 1) // Cap maximum delay at 1 second
+      }}
+      className="group cursor-pointer"
+      layout
+    >
+      <div className="relative overflow-hidden rounded-xl mb-4 h-[400px] bg-gray-50">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-102"
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = `https://via.placeholder.com/400x600/f5f5f5/333333?text=${encodeURIComponent(product.name)}`;
+          }}
+        />
+        {product.tag && (
+          <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-semibold rounded-full">
+            {product.tag}
+          </div>
+        )}
+        {product.discount && (
+          <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-xs font-semibold rounded-full">
+            {product.discount}
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-3">
+            <button
+              className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+              onClick={(e) => onAddToCart(product, e)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </button>
+            <button
+              className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <h3 className="font-medium text-lg">{product.name}</h3>
+      <p className="text-lg font-bold mt-1">{product.price}</p>
+    </motion.div>
+  );
+});
+
 export default function AllProducts() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("default");
   const { addToCart } = useCart();
 
-  const handleAddToCart = (product, e) => {
-    e.stopPropagation(); // Prevent event bubbling
+  const handleAddToCart = useCallback((product, e) => {
+    e.stopPropagation();
     addToCart(product);
     toast.success(`${product.name} added to cart!`);
-  };
+  }, [addToCart]);
 
-  const filteredProducts = products.filter(product => 
-    selectedCategory === "All" ? true : product.category === selectedCategory
-  );
+  const filteredAndSortedProducts = useMemo(() => {
+    const filtered = selectedCategory === "All" 
+      ? products 
+      : products.filter(product => product.category === selectedCategory);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === "price-low-high") {
-      return parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", ""));
+      return [...filtered].sort((a, b) => 
+        parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")));
     } else if (sortBy === "price-high-low") {
-      return parseFloat(b.price.replace("$", "")) - parseFloat(a.price.replace("$", ""));
+      return [...filtered].sort((a, b) => 
+        parseFloat(b.price.replace("$", "")) - parseFloat(a.price.replace("$", "")));
     }
-    return 0;
-  });
+    return filtered;
+  }, [selectedCategory, sortBy]);
 
   return (
     <div className="min-h-screen bg-white">
-     
       <div className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4">
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
             className="text-4xl md:text-5xl font-bold text-center mb-4"
           >
             All Products
@@ -196,7 +261,7 @@ export default function AllProducts() {
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             className="text-gray-600 text-center"
           >
             Discover our complete collection of trendy fashion items
@@ -204,24 +269,21 @@ export default function AllProducts() {
         </div>
       </div>
 
-   
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
-              <motion.button
+              <button
                 key={category}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full ${
+                className={`px-4 py-2 rounded-full transition-colors ${
                   selectedCategory === category
                     ? "bg-black text-white"
                     : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                 }`}
               >
                 {category}
-              </motion.button>
+              </button>
             ))}
           </div>
           <select
@@ -235,67 +297,17 @@ export default function AllProducts() {
           </select>
         </div>
 
-      
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {sortedProducts.map((product, idx) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              whileHover={{ y: -10 }}
-              className="group cursor-pointer"
-            >
-              <div className="relative overflow-hidden rounded-xl mb-4 h-[400px] bg-gray-50">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = `https://via.placeholder.com/400x600/f5f5f5/333333?text=${encodeURIComponent(product.name)}`;
-                  }}
-                />
-                {product.tag && (
-                  <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-semibold rounded-full">
-                    {product.tag}
-                  </div>
-                )}
-                {product.discount && (
-                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 text-xs font-semibold rounded-full">
-                    {product.discount}
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-3">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100"
-                      onClick={(e) => handleAddToCart(product, e)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="bg-white text-black p-3 rounded-full shadow-lg hover:bg-gray-100"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-              <h3 className="font-medium text-lg">{product.name}</h3>
-              <p className="text-lg font-bold mt-1">{product.price}</p>
-            </motion.div>
-          ))}
+          <AnimatePresence>
+            {filteredAndSortedProducts.map((product, idx) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={handleAddToCart}
+                index={idx}
+              />
+            ))}
+          </AnimatePresence>
         </div>
       </div>
     </div>
