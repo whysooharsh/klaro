@@ -6,6 +6,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+
+  // Load data from localStorage on initial mount
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedCart = localStorage.getItem('cart');
@@ -16,12 +18,14 @@ export const AuthProvider = ({ children }) => {
     if (storedWishlist) setWishlist(JSON.parse(storedWishlist));
   }, []);
 
+  // Persist cart changes to localStorage
   useEffect(() => {
-    if (cart.length > 0) localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+  // Persist wishlist changes to localStorage
   useEffect(() => {
-    if (wishlist.length > 0) localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
   const login = (userData) => {
@@ -60,11 +64,11 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setCart([]);
+    setWishlist([]);
     localStorage.removeItem('user');
     localStorage.removeItem('cart');
     localStorage.removeItem('wishlist');
-    setCart([]);
-    setWishlist([]);
   };
 
   const addToCart = (product) => {
@@ -86,26 +90,39 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateCartQuantity = (productId, quantity) => {
+    if (quantity < 1) {
+      removeFromCart(productId);
+      return;
+    }
     setCart(cart.map(item => 
       item.id === productId 
-        ? { ...item, quantity: Math.max(0, quantity) }
+        ? { ...item, quantity }
         : item
     ));
   };
 
   const addToWishlist = (product) => {
     if (!wishlist.some(item => item.id === product.id)) {
-      setWishlist([...wishlist, product]);
+      const updatedWishlist = [...wishlist, product];
+      setWishlist(updatedWishlist);
+      return true;
     }
+    return false;
   };
 
   const removeFromWishlist = (productId) => {
-    setWishlist(wishlist.filter(item => item.id !== productId));
+    const updatedWishlist = wishlist.filter(item => item.id !== productId);
+    setWishlist(updatedWishlist);
   };
 
   const clearCart = () => {
     setCart([]);
     localStorage.removeItem('cart');
+  };
+
+  const clearWishlist = () => {
+    setWishlist([]);
+    localStorage.removeItem('wishlist');
   };
 
   return (
@@ -121,7 +138,8 @@ export const AuthProvider = ({ children }) => {
       updateCartQuantity,
       addToWishlist,
       removeFromWishlist,
-      clearCart
+      clearCart,
+      clearWishlist
     }}>
       {children}
     </AuthContext.Provider>

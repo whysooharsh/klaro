@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaRobot, FaTimes, FaHeadset, FaInfoCircle, FaQuestionCircle, FaShippingFast } from 'react-icons/fa';
-import { FiSend } from 'react-icons/fi';
+import { FiSend, FiShoppingCart, FiHeart } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   getSimilarProducts, 
@@ -11,18 +11,24 @@ import {
   updateUserPreferences 
 } from '../services/RecommendationService';
 
-const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userProfile }) => {
+const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userProfile, handlers }) => {
   const [messages, setMessages] = useState([
     {
       text: "Hi! I'm your personal shopping assistant. I can help you find the perfect outfit! You can ask me about specific types of clothing, occasions, or your style preferences.",
       isBot: true,
-      type: 'welcome'
+      type: 'welcome',
+      quickActions: [
+        { text: 'Show me dresses', icon: '👗' },
+        { text: 'Find casual outfits', icon: '👕' },
+        { text: 'View my cart', icon: '🛒' },
+        { text: 'Check wishlist', icon: '❤️' }
+      ]
     }
   ]);
   const [userInput, setUserInput] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [chatSection, setChatSection] = useState('shopping'); // 'shopping', 'support', 'faq', 'shipping'
+  const [chatSection, setChatSection] = useState('shopping');
   const messagesEndRef = useRef(null);
   const [viewedProducts, setViewedProducts] = useState(new Set());
   const [lastViewedProduct, setLastViewedProduct] = useState(null);
@@ -35,12 +41,11 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userP
     scrollToBottom();
   }, [messages]);
 
-  // Track product view duration
   useEffect(() => {
     let startTime = Date.now();
     return () => {
       if (lastViewedProduct) {
-        const duration = (Date.now() - startTime) / 1000; // Convert to seconds
+        const duration = (Date.now() - startTime) / 1000;
         updateUserPreferences(lastViewedProduct, 'view', duration);
       }
     };
@@ -54,7 +59,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userP
     setUserInput('');
     setIsTyping(true);
 
-    // Simulate typing delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     let response;
@@ -69,7 +73,13 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userP
         response = generateShippingResponse(message);
         break;
       default:
-        response = generateBotResponse(message, products);
+        response = await generateBotResponse(message, { 
+          products, 
+          cartItems, 
+          wishlistItems, 
+          lastViewedProduct,
+          handlers
+        });
     }
     
     setMessages([...newMessages, response]);
@@ -103,13 +113,6 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userP
       }]);
     }
   };
-
-  const quickActions = [
-    { text: 'Show me dresses', icon: '👗' },
-    { text: 'Find casual outfits', icon: '👕' },
-    { text: 'View my cart', icon: '🛒' },
-    { text: 'Check wishlist', icon: '❤️' }
-  ];
 
   const supportQuickActions = [
     { text: 'Return policy', icon: '📦' },
@@ -333,285 +336,288 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userP
     };
   };
 
-  const generateBotResponse = (message, products) => {
-    const lowercaseMessage = message.toLowerCase();
-    let recommendedProducts = [];
-    let responseText = "";
-    let responseType = 'text';
+  const generateBotResponse = async (message, context) => {
+    const {
+      products,
+      cartItems,
+      wishlistItems,
+      lastViewedProduct,
+      handlers
+    } = context;
 
-    // Enhanced category detection with subcategories
-    const categories = {
-      dresses: ['dress', 'dresses', 'gown', 'gowns', 'party dress', 'evening dress', 'cocktail dress', 'maxi dress'],
-      tops: ['top', 'shirt', 'blouse', 't-shirt', 'tshirt', 'sweater', 'hoodie', 'sweatshirt', 'tank'],
-      bottoms: ['bottom', 'pants', 'jeans', 'skirt', 'trousers', 'shorts', 'leggings'],
-      outerwear: ['jacket', 'coat', 'blazer', 'cardigan', 'outerwear'],
-      activewear: ['activewear', 'workout', 'gym', 'athletic', 'sports', 'leggings']
-    };
-
-    // Enhanced material detection
-    const materials = {
-      natural: ['cotton', 'linen', 'silk', 'wool', 'cashmere'],
-      synthetic: ['polyester', 'nylon', 'spandex', 'elastane'],
-      denim: ['denim', 'jean'],
-      leather: ['leather', 'suede']
-    };
-
-    // Price range detection with specific ranges
-    const priceRanges = {
-      budget: { keywords: ['cheap', 'affordable', 'budget', 'under 50', 'inexpensive'], range: price => price < 50 },
-      mid: { keywords: ['mid-range', 'moderate', '50-100', 'mid price'], range: price => price >= 50 && price <= 100 },
-      premium: { keywords: ['expensive', 'luxury', 'premium', 'over 100', 'high-end'], range: price => price > 100 }
-    };
-
-    // Enhanced occasion detection
-    const occasions = {
-      formal: ['formal', 'office', 'business', 'work', 'professional', 'meeting'],
-      casual: ['casual', 'everyday', 'daily', 'relaxed', 'weekend'],
-      party: ['party', 'evening', 'night', 'event', 'celebration', 'cocktail'],
-      summer: ['summer', 'beach', 'vacation', 'resort', 'tropical'],
-      winter: ['winter', 'cold', 'snow', 'holiday', 'christmas']
-    };
-
-    // Enhanced style detection
-    const styles = {
-      classic: ['classic', 'timeless', 'traditional', 'basic'],
-      trendy: ['trendy', 'fashionable', 'stylish', 'modern', 'contemporary'],
-      bohemian: ['boho', 'bohemian', 'hippie', 'artistic'],
-      elegant: ['elegant', 'sophisticated', 'classy', 'refined'],
-      sporty: ['sporty', 'athletic', 'active', 'casual']
-    };
-
-    // Color detection with variations
-    const colors = {
-      red: ['red', 'maroon', 'burgundy', 'crimson'],
-      blue: ['blue', 'navy', 'azure', 'turquoise'],
-      green: ['green', 'olive', 'emerald', 'sage'],
-      black: ['black', 'charcoal'],
-      white: ['white', 'ivory', 'cream'],
-      pink: ['pink', 'rose', 'blush', 'magenta'],
-      yellow: ['yellow', 'gold', 'mustard'],
-      purple: ['purple', 'violet', 'lavender', 'plum'],
-      brown: ['brown', 'tan', 'beige', 'khaki'],
-      gray: ['gray', 'grey', 'silver']
-    };
-
-    // Process category filters
-    Object.entries(categories).forEach(([category, keywords]) => {
-      if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        recommendedProducts = products.filter(p => 
-          p.category.toLowerCase() === category || 
-          p.tags.some(tag => keywords.includes(tag.toLowerCase()))
-        );
-        responseText = `Here are some ${category} that might interest you!`;
-      }
-    });
-
-    // Process material filters
-    Object.entries(materials).forEach(([material, keywords]) => {
-      if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        const materialProducts = products.filter(p => 
-          p.description.toLowerCase().includes(material) || 
-          p.tags.some(tag => keywords.includes(tag.toLowerCase()))
-        );
-        if (materialProducts.length > 0) {
-          recommendedProducts = materialProducts;
-          responseText = `Here are our ${material} items!`;
-        }
-      }
-    });
-
-    // Process price range filters
-    Object.entries(priceRanges).forEach(([range, { keywords, range: priceRange }]) => {
-      if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        recommendedProducts = products.filter(priceRange);
-        responseText = `Here are some ${range} options within your budget!`;
-      }
-    });
-
-    // Process occasion filters
-    Object.entries(occasions).forEach(([occasion, keywords]) => {
-      if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        recommendedProducts = products.filter(p => 
-          p.tags.some(tag => keywords.includes(tag.toLowerCase())) ||
-          p.description.toLowerCase().includes(occasion)
-        );
-        responseText = `Perfect choices for ${occasion} occasions!`;
-      }
-    });
-
-    // Process style filters
-    Object.entries(styles).forEach(([style, keywords]) => {
-      if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        recommendedProducts = products.filter(p => 
-          p.tags.some(tag => keywords.includes(tag.toLowerCase())) ||
-          p.description.toLowerCase().includes(style)
-        );
-        responseText = `Here are some ${style} pieces that match your style!`;
-      }
-    });
-
-    // Process color filters
-    Object.entries(colors).forEach(([color, variations]) => {
-      if (variations.some(variation => lowercaseMessage.includes(variation))) {
-        const colorProducts = products.filter(p => 
-          variations.some(v => 
-            p.description.toLowerCase().includes(v) || 
-            p.tags.some(tag => tag.toLowerCase().includes(v))
-          )
-        );
-        if (colorProducts.length > 0) {
-          recommendedProducts = colorProducts;
-          responseText = `Here are our ${color} items!`;
-        }
-      }
-    });
-
-    // Handle multiple filters
-    const allFilters = [...Object.values(categories).flat(), 
-                       ...Object.values(materials).flat(),
-                       ...Object.values(priceRanges).map(pr => pr.keywords).flat(),
-                       ...Object.values(occasions).flat(),
-                       ...Object.values(styles).flat(),
-                       ...Object.values(colors).map(c => c).flat()];
+    const lowerMessage = message.toLowerCase().trim();
     
-    const matchedFilters = allFilters.filter(filter => lowercaseMessage.includes(filter));
-    
-    if (matchedFilters.length > 1) {
-      // Apply all matching filters
-      recommendedProducts = products.filter(product => 
-        matchedFilters.every(filter => 
-          product.tags.some(tag => tag.toLowerCase().includes(filter)) ||
-          product.description.toLowerCase().includes(filter) ||
-          product.category.toLowerCase().includes(filter)
-        )
-      );
-      responseText = `Here are items matching all your criteria: ${matchedFilters.join(', ')}`;
-    }
-
-    if (recommendedProducts.length > 0) {
-      onProductRecommend(recommendedProducts);
+    // Handle greetings and common phrases
+    const greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening'];
+    if (greetings.some(greeting => lowerMessage.includes(greeting))) {
       return {
-        text: `${responseText} I've highlighted them in the product grid. Would you like me to help you find something else?`,
-        isBot: true,
-        type: 'product',
-        products: recommendedProducts.slice(0, 3),
-        quickActions: [
-          { text: 'Show more like these', icon: '🔄' },
-          { text: 'Refine search', icon: '🔍' },
-          { text: 'Different style', icon: '👕' }
-        ]
-      };
-    }
-
-    // Handle no results
-    if (matchedFilters.length > 0 && recommendedProducts.length === 0) {
-      return {
-        text: `I couldn't find any items matching exactly what you're looking for. Would you like to see some similar alternatives or try a different search?`,
-        isBot: true,
-        type: 'no-results',
-        quickActions: [
-          { text: 'Show alternatives', icon: '🔄' },
-          { text: 'New search', icon: '🔍' },
-          { text: 'Browse all', icon: '👀' }
-        ]
-      };
-    }
-
-    if (lowercaseMessage.includes('cart') || lowercaseMessage.includes('basket')) {
-      if (cartItems.length > 0) {
-        return {
-          text: `You have ${cartItems.length} items in your cart. Would you like to view your cart or continue shopping?`,
-          isBot: true,
-          type: 'cart',
-          items: cartItems,
-          quickActions: [
-            { text: 'View cart', icon: '🛒' },
-            { text: 'Continue shopping', icon: '🛍️' },
-            { text: 'Checkout', icon: '💳' }
-          ]
-        };
-      } else {
-        return {
-          text: "Your cart is currently empty. Would you like me to help you find something to add?",
-          isBot: true,
-          type: 'empty-cart',
-          quickActions: [
-            { text: 'Show popular items', icon: '🔥' },
-            { text: 'See new arrivals', icon: '✨' }
-          ]
-        };
-      }
-    }
-
-    if (lowercaseMessage.includes('wishlist') || lowercaseMessage.includes('favorite')) {
-      if (wishlistItems.length > 0) {
-        return {
-          text: `You have ${wishlistItems.length} items in your wishlist. Would you like to view your wishlist or continue shopping?`,
-          isBot: true,
-          type: 'wishlist',
-          items: wishlistItems,
-          quickActions: [
-            { text: 'View wishlist', icon: '❤️' },
-            { text: 'Continue shopping', icon: '🛍️' },
-            { text: 'Add all to cart', icon: '🛒' }
-          ]
-        };
-      } else {
-        return {
-          text: "Your wishlist is currently empty. Would you like me to help you find something to add?",
-          isBot: true,
-          type: 'empty-wishlist',
-          quickActions: [
-            { text: 'Show popular items', icon: '🔥' },
-            { text: 'See new arrivals', icon: '✨' }
-          ]
-        };
-      }
-    }
-
-    // Handle personalization requests
-    if (lowercaseMessage.includes('recommend') || lowercaseMessage.includes('suggestion')) {
-      return generatePersonalizedResponse();
-    }
-
-    // Handle similar product requests
-    if (lowercaseMessage.includes('similar') && lastViewedProduct) {
-      return generateSimilarProductsResponse(lastViewedProduct);
-    }
-
-    // Handle complementary product requests
-    if ((lowercaseMessage.includes('complete') || lowercaseMessage.includes('match') || lowercaseMessage.includes('outfit')) && lastViewedProduct) {
-      return generateComplementaryResponse(lastViewedProduct);
-    }
-
-    // Handle size recommendation requests
-    if (lowercaseMessage.includes('size') && lastViewedProduct) {
-      return generateSizeRecommendation(lastViewedProduct);
-    }
-
-    // Handle general greeting or small talk
-    if (lowercaseMessage.includes('hello') || lowercaseMessage.includes('hi') || lowercaseMessage.includes('hey')) {
-      return {
-        text: "Hello there! I'm your personal shopping assistant. How can I help you today? Are you looking for something specific or just browsing?",
+        text: "Hello! 👋 How can I help you today? I can help you find clothing, check your cart, or provide size recommendations.",
         isBot: true,
         type: 'greeting',
-        quickActions
+        quickActions: [
+          { text: 'Find new clothes', icon: '👕' },
+          { text: 'Check my cart', icon: '🛒' },
+          { text: 'Size guide', icon: '📏' }
+        ]
       };
     }
 
-    if (lowercaseMessage.includes('thank')) {
+    // Handle thank you messages
+    if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
       return {
-        text: "You're very welcome! I'm happy to help with anything else you might need. Happy shopping!",
+        text: "You're welcome! Is there anything else I can help you with?",
         isBot: true,
-        type: 'thanks'
+        type: 'acknowledgment',
+        quickActions: [
+          { text: 'Show recommendations', icon: '🎯' },
+          { text: 'View trending', icon: '🔥' },
+          { text: 'Need help', icon: '❓' }
+        ]
+      };
+    }
+
+    // Handle help requests
+    if (lowerMessage.includes('help') || lowerMessage === '?') {
+      return {
+        text: "I can help you with:\n• Finding specific clothing items\n• Checking your cart and wishlist\n• Size recommendations\n• Product suggestions\n• Order support\n\nWhat would you like help with?",
+        isBot: true,
+        type: 'help',
+        quickActions: [
+          { text: 'Find clothes', icon: '🔍' },
+          { text: 'Size help', icon: '📏' },
+          { text: 'Order support', icon: '📦' }
+        ]
+      };
+    }
+
+    // Handle cart-related queries
+    if (lowerMessage.includes('cart') || lowerMessage.includes('basket')) {
+      if (cartItems.length === 0) {
+        const recommendations = getPersonalizedRecommendations(3);
+        return {
+          text: "Your cart is empty. Based on your preferences, here are some items you might like:",
+          isBot: true,
+          type: 'recommendation',
+          products: recommendations,
+          quickActions: [
+            { text: 'Show more', icon: '🔄' },
+            { text: 'View trending', icon: '🔥' },
+            { text: 'Browse categories', icon: '📂' }
+          ]
+        };
+      }
+
+      const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const complementaryItems = cartItems.length > 0 
+        ? getComplementaryProducts(cartItems[cartItems.length - 1], 3)
+        : [];
+        
+      return {
+        text: `You have ${cartItems.length} item(s) in your cart. Total: $${total.toFixed(2)}`,
+        isBot: true,
+        type: 'cart',
+        products: cartItems,
+        complementaryProducts: complementaryItems,
+        quickActions: [
+          { text: 'Checkout', icon: '💳' },
+          { text: 'Save for later', icon: '⭐' },
+          { text: 'Complete the look', icon: '👗' }
+        ]
+      };
+    }
+
+    // Handle wishlist queries
+    if (lowerMessage.includes('wishlist')) {
+      if (wishlistItems.length === 0) {
+        const trendingItems = getTrendingProducts(3);
+        return {
+          text: "Your wishlist is empty. Here are some trending items you might like:",
+          isBot: true,
+          type: 'trending',
+          products: trendingItems,
+          quickActions: [
+            { text: 'View all trending', icon: '🔥' },
+            { text: 'Personalized picks', icon: '🎯' },
+            { text: 'Browse categories', icon: '📂' }
+          ]
+        };
+      }
+      
+      const similarItems = wishlistItems.length > 0 
+        ? getSimilarProducts(wishlistItems[wishlistItems.length - 1], 3)
+        : [];
+        
+      return {
+        text: "Here are the items in your wishlist:",
+        isBot: true,
+        type: 'wishlist',
+        products: wishlistItems,
+        similarProducts: similarItems,
+        quickActions: [
+          { text: 'Add all to cart', icon: '🛒' },
+          { text: 'Similar items', icon: '👕' },
+          { text: 'Clear wishlist', icon: '🗑️' }
+        ]
+      };
+    }
+
+    // Handle recommendation requests
+    if (lowerMessage.includes('recommend') || lowerMessage.includes('suggestion') || 
+        lowerMessage.includes('show me') || lowerMessage.includes('find me') ||
+        lowerMessage.includes('looking for')) {
+      if (lastViewedProduct) {
+        const similarProducts = getSimilarProducts(lastViewedProduct, 3);
+        const complementaryProducts = getComplementaryProducts(lastViewedProduct, 2);
+        
+        return {
+          text: `Based on your interest in ${lastViewedProduct.name}, you might like these:`,
+          isBot: true,
+          type: 'mixed-recommendation',
+          products: similarProducts,
+          complementaryProducts: complementaryProducts,
+          quickActions: [
+            { text: 'More similar items', icon: '🔄' },
+            { text: 'Complete the look', icon: '👗' },
+            { text: 'Different style', icon: '🎨' }
+          ]
+        };
+      }
+
+      const personalizedRecs = getPersonalizedRecommendations(3);
+      const trendingItems = getTrendingProducts(2);
+      
+      return {
+        text: "Here are some items picked just for you, along with what's trending:",
+        isBot: true,
+        type: 'mixed-recommendation',
+        products: personalizedRecs,
+        trendingProducts: trendingItems,
+        quickActions: [
+          { text: 'More recommendations', icon: '🎯' },
+          { text: 'View trending', icon: '🔥' },
+          { text: 'Browse categories', icon: '📂' }
+        ]
+      };
+    }
+
+    // Handle size recommendations
+    if (lowerMessage.includes('size') || lowerMessage.includes('fit')) {
+      if (lastViewedProduct) {
+        const sizeRec = getSizeRecommendation(lastViewedProduct, userProfile);
+        return {
+          text: `For the ${lastViewedProduct.name}, I recommend size ${sizeRec.recommendedSize} (${Math.round(sizeRec.confidence * 100)}% confidence).\n\n${sizeRec.fitNote}`,
+          isBot: true,
+          type: 'size-recommendation',
+          sizeInfo: sizeRec,
+          product: lastViewedProduct,
+          quickActions: [
+            { text: 'View size chart', icon: '📏' },
+            { text: 'Update measurements', icon: '📐' },
+            { text: 'See similar items', icon: '👕' }
+          ]
+        };
+      }
+    }
+
+    // Handle category filters with fuzzy matching
+    const categoryKeywords = {
+      'tops': ['top', 'shirt', 'blouse', 'tee', 't-shirt', 'sweater'],
+      'bottoms': ['bottom', 'pants', 'jeans', 'skirt', 'shorts', 'trousers'],
+      'dresses': ['dress', 'gown', 'frock'],
+      'accessories': ['accessory', 'accessories', 'jewelry', 'belt', 'scarf'],
+      'shoes': ['shoe', 'sneaker', 'boot', 'sandal', 'heel'],
+      'outerwear': ['jacket', 'coat', 'blazer', 'cardigan']
+    };
+
+    for (const [category, keywords] of Object.entries(categoryKeywords)) {
+      if (keywords.some(keyword => lowerMessage.includes(keyword))) {
+        const categoryProducts = products
+          .filter(p => p.category.toLowerCase() === category)
+          .slice(0, 3);
+          
+        if (categoryProducts.length > 0) {
+          return {
+            text: `Here are some ${category} that match your style:`,
+            isBot: true,
+            type: 'category',
+            products: categoryProducts,
+            quickActions: [
+              { text: `More ${category}`, icon: '🔄' },
+              { text: 'Filter by price', icon: '💰' },
+              { text: 'Sort by trending', icon: '🔥' }
+            ]
+          };
+        }
+      }
+    }
+
+    // Handle price-related queries
+    if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('expensive') || lowerMessage.includes('cheap')) {
+      const priceRangeProducts = products
+        .filter(p => {
+          if (lowerMessage.includes('cheap') || lowerMessage.includes('under 50')) return p.price < 50;
+          if (lowerMessage.includes('expensive') || lowerMessage.includes('luxury')) return p.price > 100;
+          return p.price >= 50 && p.price <= 100;
+        })
+        .slice(0, 3);
+
+      return {
+        text: `Here are some items in your desired price range:`,
+        isBot: true,
+        type: 'price',
+        products: priceRangeProducts,
+        quickActions: [
+          { text: 'Under $50', icon: '💰' },
+          { text: '$50-$100', icon: '💰' },
+          { text: 'Over $100', icon: '💰' }
+        ]
+      };
+    }
+
+    // If no specific intent is matched but we have context from last viewed product
+    if (lastViewedProduct) {
+      const similarProducts = getSimilarProducts(lastViewedProduct, 3);
+      return {
+        text: `Based on your interest in ${lastViewedProduct.name}, you might like these similar items:`,
+        isBot: true,
+        type: 'contextual-recommendation',
+        products: similarProducts,
+        quickActions: [
+          { text: 'Show more similar', icon: '🔄' },
+          { text: 'Different style', icon: '🎨' },
+          { text: 'View trending', icon: '🔥' }
+        ]
+      };
+    }
+
+    // Default response with personalized recommendations
+    const personalizedRecs = getPersonalizedRecommendations(3);
+    const hasSufficientPreferences = Object.values(userPreferences.categories).some(val => val > 0) ||
+                                   Object.values(userPreferences.tags).some(val => val > 0);
+
+    if (!hasSufficientPreferences) {
+      return {
+        text: "I'd love to help you find something! What kind of clothing are you looking for? You can ask about specific items like dresses, tops, or accessories.",
+        isBot: true,
+        type: 'no-context',
+        quickActions: [
+          { text: 'Show dresses', icon: '👗' },
+          { text: 'View tops', icon: '👕' },
+          { text: 'Browse trending', icon: '🔥' }
+        ]
       };
     }
 
     return {
-      text: "I'm here to help you find the perfect outfit! You can ask me about:\n- Specific types of clothing (dresses, tops, bottoms)\n- Occasions (formal, casual, party)\n- Price ranges (affordable, premium)\n- Colors\n- Your cart or wishlist\nWhat would you like to know?",
+      text: "Based on your browsing history, I think you might like these items:",
       isBot: true,
-      type: 'help',
-      quickActions
+      type: 'recommendation',
+      products: personalizedRecs,
+      quickActions: [
+        { text: 'Show more', icon: '🔄' },
+        { text: 'Different style', icon: '🎨' },
+        { text: 'Browse categories', icon: '📂' }
+      ]
     };
   };
 
@@ -675,43 +681,42 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userP
     }
   };
 
-  const renderProductRecommendations = (message) => {
-    if (!message.products || message.products.length === 0) return null;
+  const renderProductRecommendations = (products, handlers) => {
+    if (!products || products.length === 0) return null;
 
     return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="mt-4 space-y-4"
-      >
-        <div className="grid grid-cols-3 gap-3">
-          {message.products.map((product, idx) => (
-            <motion.div 
-              key={idx}
-              className="relative group"
-              whileHover={{ scale: 1.05 }}
-              onClick={() => handleProductView(product)}
-            >
-              <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover transform transition-transform group-hover:scale-110"
-                />
+      <div className="flex flex-col gap-4 mt-4">
+        {products.map((product) => (
+          <div key={product.id} className="flex items-start gap-4 p-4 bg-white rounded-lg shadow-sm">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-20 h-20 object-cover rounded-md"
+            />
+            <div className="flex-1">
+              <h4 className="font-medium text-gray-900">{product.name}</h4>
+              <p className="text-sm text-gray-600">${product.price.toFixed(2)}</p>
+              <p className="text-xs text-gray-500 line-clamp-2">{product.description}</p>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => handlers.onAddToCart(product)}
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  <FiShoppingCart className="w-4 h-4" />
+                  Add to Cart
+                </button>
+                <button
+                  onClick={() => handlers.onAddToWishlist(product)}
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-pink-600 text-white rounded-md hover:bg-pink-700"
+                >
+                  <FiHeart className="w-4 h-4" />
+                  Wishlist
+                </button>
               </div>
-              <div className="mt-2 text-sm">
-                <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                <p className="text-gray-500">${product.price}</p>
-                {message.type === 'similar' && (
-                  <p className="text-xs text-blue-600">
-                    {Math.round(product.similarity * 100)}% match
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+            </div>
+          </div>
+        ))}
+      </div>
     );
   };
 
@@ -759,21 +764,48 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userP
                 >
                   <div className="whitespace-pre-line">{message.text}</div>
                   
-                  {message.type === 'product' && message.products && (
+                  {message.products && message.products.length > 0 && (
                     <motion.div 
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="mt-2 grid grid-cols-3 gap-2"
+                      className="mt-2 grid grid-cols-2 gap-2"
                     >
                       {message.products.map((product, idx) => (
                         <motion.div 
                           key={idx} 
-                          className="text-center"
+                          className="relative group bg-white rounded-lg p-2 shadow-sm"
                           whileHover={{ scale: 1.05 }}
+                          onClick={() => handleProductView(product)}
                         >
-                          <img src={product.image} alt={product.name} className="w-full h-20 object-cover rounded" />
-                          <p className="text-xs mt-1 font-medium">{product.name}</p>
-                          <p className="text-xs">${product.price}</p>
+                          <img 
+                            src={product.image} 
+                            alt={product.name} 
+                            className="w-full h-24 object-cover rounded-md"
+                          />
+                          <div className="mt-2">
+                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                            <p className="text-sm text-gray-500">${product.price}</p>
+                          </div>
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlers.onAddToCart(product);
+                              }}
+                              className="mx-1 p-2 bg-white rounded-full shadow-md hover:bg-gray-100"
+                            >
+                              <FiShoppingCart className="text-gray-800" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlers.onAddToWishlist(product);
+                              }}
+                              className="mx-1 p-2 bg-white rounded-full shadow-md hover:bg-gray-100"
+                            >
+                              <FiHeart className="text-gray-800" />
+                            </button>
+                          </div>
                         </motion.div>
                       ))}
                     </motion.div>

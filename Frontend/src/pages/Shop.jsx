@@ -22,7 +22,7 @@ const Shop = () => {
     category: 'all',
     sortBy: 'featured'
   });
-  const [showChatbot, setShowChatbot] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(true);
   const [highlightedProducts, setHighlightedProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [showOnlyHighlighted, setShowOnlyHighlighted] = useState(false);
@@ -668,6 +668,10 @@ const Shop = () => {
           cartItems={cart}
           wishlistItems={wishlist}
           userProfile={user}
+          handlers={{
+            onAddToCart: handleAddToCart,
+            onAddToWishlist: handleAddToWishlist
+          }}
         />
       )}
     </motion.div>

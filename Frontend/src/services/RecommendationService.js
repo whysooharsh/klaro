@@ -1,15 +1,17 @@
 import { products } from '../data/products';
 
 const calculateProductSimilarity = (product1, product2) => {
-  const commonTags = product1.tags.filter(tag => product2.tags.includes(tag));
+  if (!product1 || !product2) return 0;
+  
+  const commonTags = product1.tags?.filter(tag => product2.tags?.includes(tag)) || [];
   const categoryMatch = product1.category === product2.category ? 1 : 0;
-  const priceRangeSimilarity = 1 - Math.abs(product1.price - product2.price) / Math.max(product1.price, product2.price);
+  const priceRangeSimilarity = 1 - Math.abs((product1.price || 0) - (product2.price || 0)) / Math.max(product1.price || 1, product2.price || 1);
   
   return (commonTags.length * 0.4) + (categoryMatch * 0.3) + (priceRangeSimilarity * 0.3);
 };
 
 export const getSimilarProducts = (product, limit = 4) => {
-  if (!product) return [];
+  if (!product || !products) return [];
   
   const similarities = products
     .filter(p => p.id !== product.id)
@@ -41,50 +43,74 @@ let userPreferences = {
 };
 
 export const updateUserPreferences = (product, action, duration = 0) => {
+  if (!product) return;
+  
   const weight = userBehaviorWeights[action] || 1;
  
-  userPreferences.categories[product.category] = 
-    (userPreferences.categories[product.category] || 0) + weight;
+  // Update category preference
+  if (product.category) {
+    userPreferences.categories[product.category] = 
+      (userPreferences.categories[product.category] || 0) + weight;
+  }
   
-
-  product.tags.forEach(tag => {
-    userPreferences.tags[tag] = (userPreferences.tags[tag] || 0) + weight;
-  });
+  // Update tag preferences
+  if (product.tags) {
+    product.tags.forEach(tag => {
+      userPreferences.tags[tag] = (userPreferences.tags[tag] || 0) + weight;
+    });
+  }
   
-
+  // Update price range preference
   const priceRange = getPriceRange(product.price);
-  userPreferences.priceRanges[priceRange] = 
-    (userPreferences.priceRanges[priceRange] || 0) + weight;
+  if (priceRange) {
+    userPreferences.priceRanges[priceRange] = 
+      (userPreferences.priceRanges[priceRange] || 0) + weight;
+  }
   
-
+  // Add time-based weight if provided
   if (duration > 0) {
     const timeWeight = duration * userBehaviorWeights.timeSpent;
-    userPreferences.categories[product.category] += timeWeight;
-    product.tags.forEach(tag => {
-      userPreferences.tags[tag] += timeWeight;
-    });
+    if (product.category) {
+      userPreferences.categories[product.category] += timeWeight;
+    }
+    if (product.tags) {
+      product.tags.forEach(tag => {
+        userPreferences.tags[tag] += timeWeight;
+      });
+    }
   }
 };
 
 const getPriceRange = (price) => {
+  if (!price) return 'unknown';
   if (price < 50) return 'budget';
   if (price < 100) return 'mid';
   return 'premium';
 };
 
 export const getPersonalizedRecommendations = (limit = 8) => {
+  if (!products) return [];
+  
   const scoredProducts = products.map(product => {
     let score = 0;
     
-    
-    score += userPreferences.categories[product.category] || 0;
+    // Add category preference score
+    if (product.category) {
+      score += userPreferences.categories[product.category] || 0;
+    }
    
-    product.tags.forEach(tag => {
-      score += userPreferences.tags[tag] || 0;
-    });
+    // Add tag preference scores
+    if (product.tags) {
+      product.tags.forEach(tag => {
+        score += userPreferences.tags[tag] || 0;
+      });
+    }
     
+    // Add price range preference score
     const priceRange = getPriceRange(product.price);
-    score += userPreferences.priceRanges[priceRange] || 0;
+    if (priceRange) {
+      score += userPreferences.priceRanges[priceRange] || 0;
+    }
     
     return { ...product, score };
   });
@@ -95,20 +121,21 @@ export const getPersonalizedRecommendations = (limit = 8) => {
 };
 
 export const getComplementaryProducts = (product, limit = 4) => {
-  if (!product) return [];
+  if (!product || !products) return [];
   
   const complementaryCategories = {
     'tops': ['bottoms', 'accessories'],
     'bottoms': ['tops', 'shoes'],
     'dresses': ['accessories', 'shoes'],
     'outerwear': ['tops', 'bottoms'],
-    'accessories': ['dresses', 'tops', 'bottoms']
+    'accessories': ['dresses', 'tops', 'bottoms'],
+    'shoes': ['bottoms', 'dresses']
   };
   
-  const targetCategories = complementaryCategories[product.category] || [];
+  const targetCategories = complementaryCategories[product.category?.toLowerCase()] || [];
   
   return products
-    .filter(p => targetCategories.includes(p.category))
+    .filter(p => targetCategories.includes(p.category?.toLowerCase()))
     .map(p => ({
       ...p,
       matchScore: calculateProductSimilarity(product, p)
@@ -117,15 +144,15 @@ export const getComplementaryProducts = (product, limit = 4) => {
     .slice(0, limit);
 };
 
-// Get trending products based on overall user behavior
 export const getTrendingProducts = (limit = 8) => {
+  if (!products) return [];
 
   return products
     .map(product => ({
       ...product,
       trendScore: (
         (userPreferences.categories[product.category] || 0) +
-        product.tags.reduce((sum, tag) => sum + (userPreferences.tags[tag] || 0), 0)
+        (product.tags?.reduce((sum, tag) => sum + (userPreferences.tags[tag] || 0), 0) || 0)
       ) * (Math.random() * 0.5 + 0.5) // Add some randomness for demo
     }))
     .sort((a, b) => b.trendScore - a.trendScore)
@@ -133,12 +160,24 @@ export const getTrendingProducts = (limit = 8) => {
 };
 
 export const getSizeRecommendation = (product, userProfile) => {
-  //  would use machine learning based on:
+  if (!product || !userProfile) {
+    return {
+      recommendedSize: 'M',
+      confidence: 0.7,
+      fitNote: "Please provide your measurements for a more accurate recommendation.",
+      sizingTips: [
+        "If between sizes, size up for a more comfortable fit",
+        "Check the size chart for exact measurements",
+        "Consider your preferred fit (tight, regular, loose)"
+      ]
+    };
+  }
+
+  // In a real implementation, this would use machine learning based on:
   // 1. User's previous successful purchases
   // 2. Return history and reasons
   // 3. User's measurements
   // 4. Product specific fit data
-
   return {
     recommendedSize: userProfile?.preferredSize || 'M',
     confidence: 0.85,
