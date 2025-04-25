@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FiShoppingCart, FiHeart, FiShare2, FiArrowLeft } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { products } from '../data/products';
+import axios from 'axios';
 
 const ProductDescription = () => {
   const { id } = useParams();
@@ -12,12 +13,51 @@ const ProductDescription = () => {
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [similarProducts, setSimilarProducts] = useState([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
+
+  const fetchSimilarProducts = async (imageUrl) => {
+    const encodedParams = new URLSearchParams();
+    encodedParams.set('url', imageUrl);
+
+    const options = {
+      method: 'POST',
+      url: 'https://similar-clothes-ai.p.rapidapi.com/',
+      headers: {
+        'x-rapidapi-key': '07fe85ef41msha707d181c6dfa9ep1e32a3jsne0216f14b61e',
+        'x-rapidapi-host': 'similar-clothes-ai.p.rapidapi.com',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      data: encodedParams,
+    };
+
+    try {
+      setLoadingSimilar(true);
+      console.log('Fetching similar products for image:', imageUrl);
+      const response = await axios.request(options);
+      console.log('API Response:', response.data);
+      
+      if (response.data && Array.isArray(response.data)) {
+        setSimilarProducts(response.data);
+      } else {
+        console.error('Invalid response format:', response.data);
+        setSimilarProducts([]);
+      }
+    } catch (error) {
+      console.error('Error fetching similar products:', error.response || error);
+      setSimilarProducts([]);
+    } finally {
+      setLoadingSimilar(false);
+    }
+  };
 
   useEffect(() => {
     const foundProduct = products.find(p => p.id === parseInt(id));
     if (foundProduct) {
       setProduct(foundProduct);
       setSelectedSize(foundProduct.size);
+      // Fetch similar products when product is found
+      fetchSimilarProducts(foundProduct.image);
     }
   }, [id]);
 
@@ -173,6 +213,44 @@ const ProductDescription = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+
+       
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Similar Products</h2>
+          {loadingSimilar ? (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          ) : similarProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {similarProducts.map((similarProduct, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                >
+                  <img
+                    src={similarProduct.image_url}
+                    alt={similarProduct.title || 'Similar product'}
+                    className="w-full h-64 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      {similarProduct.title || 'Similar Product'}
+                    </h3>
+                    {similarProduct.price && (
+                      <p className="text-blue-500 font-medium">${similarProduct.price}</p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600 text-center">No similar products found</p>
+          )}
         </div>
       </div>
     </motion.div>

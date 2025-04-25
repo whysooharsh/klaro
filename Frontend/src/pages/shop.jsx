@@ -5,10 +5,15 @@ import { products as initialProducts } from '../data/products';
 import Chatbot from '../components/Chatbot';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { 
+  getPersonalizedRecommendations, 
+  getTrendingProducts,
+  updateUserPreferences 
+} from '../services/RecommendationService';
 
 const Shop = () => {
   const navigate = useNavigate();
-  const { addToCart, addToWishlist, cart, wishlist } = useAuth();
+  const { addToCart, addToWishlist, cart, wishlist, user } = useAuth();
   const [products, setProducts] = useState(initialProducts);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
@@ -23,6 +28,9 @@ const Shop = () => {
   const [showOnlyHighlighted, setShowOnlyHighlighted] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [trendingProducts, setTrendingProducts] = useState([]);
+  const [viewStartTime, setViewStartTime] = useState(null);
 
   const filteredProducts = products
     .filter(product => {
@@ -52,18 +60,44 @@ const Shop = () => {
       }
     });
 
-  const handleProductRecommendation = (recommendedProducts) => {
-    const recommendedIds = recommendedProducts.map(p => p.id);
-    setHighlightedProducts(recommendedIds);
+  useEffect(() => {
+    // Load initial recommendations
+    setRecommendedProducts(getPersonalizedRecommendations(4));
+    setTrendingProducts(getTrendingProducts(4));
+  }, []);
+
+  // Track product view duration
+  useEffect(() => {
+    if (selectedProduct) {
+      setViewStartTime(Date.now());
+      updateUserPreferences(selectedProduct, 'view');
+    } else if (viewStartTime) {
+      const duration = (Date.now() - viewStartTime) / 1000;
+      if (selectedProduct) {
+        updateUserPreferences(selectedProduct, 'view', duration);
+      }
+    }
+  }, [selectedProduct]);
+
+  const handleProductRecommendation = (products) => {
+    setHighlightedProducts(products);
     setShowOnlyHighlighted(true);
+    // Update recommendations based on chatbot interaction
+    setRecommendedProducts(getPersonalizedRecommendations(4));
   };
 
   const handleAddToCart = (product) => {
     addToCart(product);
+    updateUserPreferences(product, 'addToCart');
+    // Update recommendations after user action
+    setRecommendedProducts(getPersonalizedRecommendations(4));
   };
 
   const handleAddToWishlist = (product) => {
     addToWishlist(product);
+    updateUserPreferences(product, 'addToWishlist');
+    // Update recommendations after user action
+    setRecommendedProducts(getPersonalizedRecommendations(4));
   };
 
   const getProductCount = (category) => {
@@ -84,12 +118,133 @@ const Shop = () => {
 
   const handleProductClick = (product) => {
     setSelectedProduct(product);
-    setQuantity(1);
+    updateUserPreferences(product, 'view');
   };
 
   const handleCloseProductModal = () => {
     setSelectedProduct(null);
   };
+
+  // Add a new section for personalized recommendations
+  const renderRecommendedSection = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-8"
+    >
+      <h2 className="text-2xl font-bold mb-4">Recommended for You</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {recommendedProducts.map((product) => (
+          <motion.div
+            key={product.id}
+            className="relative group"
+            whileHover={{ scale: 1.02 }}
+          >
+            <div className="relative aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover transform transition-transform group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-4">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleAddToCart(product)}
+                  className="p-2 bg-white rounded-full text-gray-800 hover:text-blue-600"
+                >
+                  <FiShoppingCart />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleAddToWishlist(product)}
+                  className="p-2 bg-white rounded-full text-gray-800 hover:text-red-600"
+                >
+                  <FiHeart />
+                </motion.button>
+              </div>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
+              <p className="text-gray-500">${product.price}</p>
+              {product.score && (
+                <div className="mt-1 flex items-center">
+                  <div className="h-2 w-full bg-gray-200 rounded-full">
+                    <div 
+                      className="h-2 bg-blue-600 rounded-full"
+                      style={{ width: `${Math.min(100, product.score * 20)}%` }}
+                    />
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">
+                    {Math.round(product.score * 20)}% match
+                  </span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+
+  // Add a new section for trending products
+  const renderTrendingSection = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-8"
+    >
+      <h2 className="text-2xl font-bold mb-4">Trending Now</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {trendingProducts.map((product) => (
+          <motion.div
+            key={product.id}
+            className="relative group"
+            whileHover={{ scale: 1.02 }}
+          >
+            {/* Similar structure to recommended products */}
+            <div className="relative aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover transform transition-transform group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-4">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleAddToCart(product)}
+                  className="p-2 bg-white rounded-full text-gray-800 hover:text-blue-600"
+                >
+                  <FiShoppingCart />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleAddToWishlist(product)}
+                  className="p-2 bg-white rounded-full text-gray-800 hover:text-red-600"
+                >
+                  <FiHeart />
+                </motion.button>
+              </div>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
+              <p className="text-gray-500">${product.price}</p>
+              {product.trendScore && (
+                <div className="mt-1 flex items-center">
+                  <span className="text-sm text-orange-600 font-medium">
+                    🔥 Trending
+                  </span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
 
   return (
     <motion.div 
@@ -276,6 +431,14 @@ const Shop = () => {
               )}
             </AnimatePresence>
 
+            {/* Add recommendation sections before the main product grid */}
+            {!showOnlyHighlighted && (
+              <>
+                {renderRecommendedSection()}
+                {renderTrendingSection()}
+              </>
+            )}
+
             <motion.div 
               layout
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -355,7 +518,7 @@ const Shop = () => {
                       >
                         {product.tags.map((tag, index) => (
                           <motion.span
-                            key={index}
+                            key={`${product.id}-tag-${index}-${tag}`}
                             className="px-2 py-1 bg-gray-100/50 backdrop-blur-sm text-gray-600 text-xs rounded-full border border-gray-200"
                             whileHover={{ scale: 1.1 }}
                           >
@@ -483,7 +646,7 @@ const Shop = () => {
                     <div className="flex flex-wrap gap-2">
                       {selectedProduct.tags.map((tag, index) => (
                         <span
-                          key={index}
+                          key={`${selectedProduct.id}-tag-${index}-${tag}`}
                           className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full"
                         >
                           {tag}
@@ -504,6 +667,7 @@ const Shop = () => {
           onProductRecommend={handleProductRecommendation}
           cartItems={cart}
           wishlistItems={wishlist}
+          userProfile={user}
         />
       )}
     </motion.div>

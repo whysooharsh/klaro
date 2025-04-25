@@ -2,8 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaRobot, FaTimes, FaHeadset, FaInfoCircle, FaQuestionCircle, FaShippingFast } from 'react-icons/fa';
 import { FiSend } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  getSimilarProducts, 
+  getPersonalizedRecommendations, 
+  getComplementaryProducts, 
+  getTrendingProducts,
+  getSizeRecommendation,
+  updateUserPreferences 
+} from '../services/RecommendationService';
 
-const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => {
+const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems, userProfile }) => {
   const [messages, setMessages] = useState([
     {
       text: "Hi! I'm your personal shopping assistant. I can help you find the perfect outfit! You can ask me about specific types of clothing, occasions, or your style preferences.",
@@ -16,6 +24,8 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
   const [isTyping, setIsTyping] = useState(false);
   const [chatSection, setChatSection] = useState('shopping'); // 'shopping', 'support', 'faq', 'shipping'
   const messagesEndRef = useRef(null);
+  const [viewedProducts, setViewedProducts] = useState(new Set());
+  const [lastViewedProduct, setLastViewedProduct] = useState(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -24,6 +34,17 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Track product view duration
+  useEffect(() => {
+    let startTime = Date.now();
+    return () => {
+      if (lastViewedProduct) {
+        const duration = (Date.now() - startTime) / 1000; // Convert to seconds
+        updateUserPreferences(lastViewedProduct, 'view', duration);
+      }
+    };
+  }, [lastViewedProduct]);
 
   const handleUserMessage = async (message) => {
     if (!message.trim()) return;
@@ -110,6 +131,78 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
     { text: 'Track my order', icon: '📦' },
     { text: 'International shipping', icon: '🌎' }
   ];
+
+  const handleProductView = (product) => {
+    setLastViewedProduct(product);
+    if (!viewedProducts.has(product.id)) {
+      setViewedProducts(new Set([...viewedProducts, product.id]));
+      updateUserPreferences(product, 'view');
+    }
+  };
+
+  const handleProductRecommend = (products) => {
+    onProductRecommend(products);
+    products.forEach(product => handleProductView(product));
+  };
+
+  const generatePersonalizedResponse = () => {
+    const recommendations = getPersonalizedRecommendations(3);
+    return {
+      text: "Based on your browsing history and preferences, I think you'll love these items:",
+      isBot: true,
+      type: 'personalized',
+      products: recommendations,
+      quickActions: [
+        { text: 'Show more like these', icon: '🔄' },
+        { text: 'Different style', icon: '👕' },
+        { text: 'View trending items', icon: '🔥' }
+      ]
+    };
+  };
+
+  const generateSimilarProductsResponse = (product) => {
+    const similar = getSimilarProducts(product, 3);
+    return {
+      text: `Here are some similar items you might like:`,
+      isBot: true,
+      type: 'similar',
+      products: similar,
+      quickActions: [
+        { text: 'Show more similar', icon: '🔄' },
+        { text: 'View details', icon: '🔍' },
+        { text: 'Different style', icon: '👕' }
+      ]
+    };
+  };
+
+  const generateComplementaryResponse = (product) => {
+    const complementary = getComplementaryProducts(product, 3);
+    return {
+      text: `Complete your look with these matching items:`,
+      isBot: true,
+      type: 'complementary',
+      products: complementary,
+      quickActions: [
+        { text: 'Show more options', icon: '🔄' },
+        { text: 'View outfit', icon: '👗' },
+        { text: 'Save look', icon: '💾' }
+      ]
+    };
+  };
+
+  const generateSizeRecommendation = (product) => {
+    const sizeRec = getSizeRecommendation(product, userProfile);
+    return {
+      text: `Based on your previous purchases and fit preferences, I recommend size ${sizeRec.recommendedSize} (${Math.round(sizeRec.confidence * 100)}% confidence).\n\n${sizeRec.fitNote}\n\nSizing tips:\n${sizeRec.sizingTips.map(tip => `• ${tip}`).join('\n')}`,
+      isBot: true,
+      type: 'size-recommendation',
+      quickActions: [
+        { text: 'View size chart', icon: '📏' },
+        { text: 'Update measurements', icon: '📐' },
+        { text: 'Learn more', icon: 'ℹ️' }
+      ]
+    };
+  };
 
   const generateSupportResponse = (message) => {
     const lowercaseMessage = message.toLowerCase();
@@ -246,64 +339,154 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
     let responseText = "";
     let responseType = 'text';
 
-    // Enhanced category detection
+    // Enhanced category detection with subcategories
     const categories = {
-      dresses: ['dress', 'dresses', 'gown', 'gowns'],
-      tops: ['top', 'shirt', 'blouse', 't-shirt', 'tshirt'],
-      bottoms: ['bottom', 'pants', 'jeans', 'skirt', 'trousers'],
-      accessories: ['accessory', 'jewelry', 'bag', 'shoes', 'hat']
+      dresses: ['dress', 'dresses', 'gown', 'gowns', 'party dress', 'evening dress', 'cocktail dress', 'maxi dress'],
+      tops: ['top', 'shirt', 'blouse', 't-shirt', 'tshirt', 'sweater', 'hoodie', 'sweatshirt', 'tank'],
+      bottoms: ['bottom', 'pants', 'jeans', 'skirt', 'trousers', 'shorts', 'leggings'],
+      outerwear: ['jacket', 'coat', 'blazer', 'cardigan', 'outerwear'],
+      activewear: ['activewear', 'workout', 'gym', 'athletic', 'sports', 'leggings']
     };
 
-    // Price range detection
+    // Enhanced material detection
+    const materials = {
+      natural: ['cotton', 'linen', 'silk', 'wool', 'cashmere'],
+      synthetic: ['polyester', 'nylon', 'spandex', 'elastane'],
+      denim: ['denim', 'jean'],
+      leather: ['leather', 'suede']
+    };
+
+    // Price range detection with specific ranges
     const priceRanges = {
-      budget: ['cheap', 'affordable', 'budget', 'under 50'],
-      mid: ['mid-range', 'moderate', '50-100'],
-      premium: ['expensive', 'luxury', 'premium', 'over 100']
+      budget: { keywords: ['cheap', 'affordable', 'budget', 'under 50', 'inexpensive'], range: price => price < 50 },
+      mid: { keywords: ['mid-range', 'moderate', '50-100', 'mid price'], range: price => price >= 50 && price <= 100 },
+      premium: { keywords: ['expensive', 'luxury', 'premium', 'over 100', 'high-end'], range: price => price > 100 }
     };
 
-    // Occasion detection
+    // Enhanced occasion detection
     const occasions = {
-      formal: ['formal', 'office', 'business', 'work'],
-      casual: ['casual', 'everyday', 'daily'],
-      party: ['party', 'evening', 'night', 'event'],
-      summer: ['summer', 'beach', 'vacation'],
-      winter: ['winter', 'cold', 'snow']
+      formal: ['formal', 'office', 'business', 'work', 'professional', 'meeting'],
+      casual: ['casual', 'everyday', 'daily', 'relaxed', 'weekend'],
+      party: ['party', 'evening', 'night', 'event', 'celebration', 'cocktail'],
+      summer: ['summer', 'beach', 'vacation', 'resort', 'tropical'],
+      winter: ['winter', 'cold', 'snow', 'holiday', 'christmas']
     };
 
-    // Color detection
-    const colors = ['red', 'blue', 'green', 'black', 'white', 'pink', 'yellow', 'purple'];
+    // Enhanced style detection
+    const styles = {
+      classic: ['classic', 'timeless', 'traditional', 'basic'],
+      trendy: ['trendy', 'fashionable', 'stylish', 'modern', 'contemporary'],
+      bohemian: ['boho', 'bohemian', 'hippie', 'artistic'],
+      elegant: ['elegant', 'sophisticated', 'classy', 'refined'],
+      sporty: ['sporty', 'athletic', 'active', 'casual']
+    };
 
-    // Process filters
+    // Color detection with variations
+    const colors = {
+      red: ['red', 'maroon', 'burgundy', 'crimson'],
+      blue: ['blue', 'navy', 'azure', 'turquoise'],
+      green: ['green', 'olive', 'emerald', 'sage'],
+      black: ['black', 'charcoal'],
+      white: ['white', 'ivory', 'cream'],
+      pink: ['pink', 'rose', 'blush', 'magenta'],
+      yellow: ['yellow', 'gold', 'mustard'],
+      purple: ['purple', 'violet', 'lavender', 'plum'],
+      brown: ['brown', 'tan', 'beige', 'khaki'],
+      gray: ['gray', 'grey', 'silver']
+    };
+
+    // Process category filters
     Object.entries(categories).forEach(([category, keywords]) => {
       if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        recommendedProducts = products.filter(p => p.category.toLowerCase() === category);
+        recommendedProducts = products.filter(p => 
+          p.category.toLowerCase() === category || 
+          p.tags.some(tag => keywords.includes(tag.toLowerCase()))
+        );
         responseText = `Here are some ${category} that might interest you!`;
       }
     });
 
-    Object.entries(priceRanges).forEach(([range, keywords]) => {
+    // Process material filters
+    Object.entries(materials).forEach(([material, keywords]) => {
       if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        const priceFilter = range === 'budget' ? p => p.price < 50 :
-                          range === 'mid' ? p => p.price >= 50 && p.price <= 100 :
-                          p => p.price > 100;
-        recommendedProducts = products.filter(priceFilter);
-        responseText = `Here are some ${range} options for you!`;
+        const materialProducts = products.filter(p => 
+          p.description.toLowerCase().includes(material) || 
+          p.tags.some(tag => keywords.includes(tag.toLowerCase()))
+        );
+        if (materialProducts.length > 0) {
+          recommendedProducts = materialProducts;
+          responseText = `Here are our ${material} items!`;
+        }
       }
     });
 
+    // Process price range filters
+    Object.entries(priceRanges).forEach(([range, { keywords, range: priceRange }]) => {
+      if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
+        recommendedProducts = products.filter(priceRange);
+        responseText = `Here are some ${range} options within your budget!`;
+      }
+    });
+
+    // Process occasion filters
     Object.entries(occasions).forEach(([occasion, keywords]) => {
       if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
-        recommendedProducts = products.filter(p => p.tags.some(tag => keywords.includes(tag)));
-        responseText = `Here are some perfect ${occasion} wear options!`;
+        recommendedProducts = products.filter(p => 
+          p.tags.some(tag => keywords.includes(tag.toLowerCase())) ||
+          p.description.toLowerCase().includes(occasion)
+        );
+        responseText = `Perfect choices for ${occasion} occasions!`;
       }
     });
 
-    colors.forEach(color => {
-      if (lowercaseMessage.includes(color)) {
-        recommendedProducts = products.filter(p => p.color.toLowerCase() === color);
-        responseText = `Here are some beautiful ${color} items!`;
+    // Process style filters
+    Object.entries(styles).forEach(([style, keywords]) => {
+      if (keywords.some(keyword => lowercaseMessage.includes(keyword))) {
+        recommendedProducts = products.filter(p => 
+          p.tags.some(tag => keywords.includes(tag.toLowerCase())) ||
+          p.description.toLowerCase().includes(style)
+        );
+        responseText = `Here are some ${style} pieces that match your style!`;
       }
     });
+
+    // Process color filters
+    Object.entries(colors).forEach(([color, variations]) => {
+      if (variations.some(variation => lowercaseMessage.includes(variation))) {
+        const colorProducts = products.filter(p => 
+          variations.some(v => 
+            p.description.toLowerCase().includes(v) || 
+            p.tags.some(tag => tag.toLowerCase().includes(v))
+          )
+        );
+        if (colorProducts.length > 0) {
+          recommendedProducts = colorProducts;
+          responseText = `Here are our ${color} items!`;
+        }
+      }
+    });
+
+    // Handle multiple filters
+    const allFilters = [...Object.values(categories).flat(), 
+                       ...Object.values(materials).flat(),
+                       ...Object.values(priceRanges).map(pr => pr.keywords).flat(),
+                       ...Object.values(occasions).flat(),
+                       ...Object.values(styles).flat(),
+                       ...Object.values(colors).map(c => c).flat()];
+    
+    const matchedFilters = allFilters.filter(filter => lowercaseMessage.includes(filter));
+    
+    if (matchedFilters.length > 1) {
+      // Apply all matching filters
+      recommendedProducts = products.filter(product => 
+        matchedFilters.every(filter => 
+          product.tags.some(tag => tag.toLowerCase().includes(filter)) ||
+          product.description.toLowerCase().includes(filter) ||
+          product.category.toLowerCase().includes(filter)
+        )
+      );
+      responseText = `Here are items matching all your criteria: ${matchedFilters.join(', ')}`;
+    }
 
     if (recommendedProducts.length > 0) {
       onProductRecommend(recommendedProducts);
@@ -311,18 +494,25 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
         text: `${responseText} I've highlighted them in the product grid. Would you like me to help you find something else?`,
         isBot: true,
         type: 'product',
-        products: recommendedProducts.slice(0, 3)
+        products: recommendedProducts.slice(0, 3),
+        quickActions: [
+          { text: 'Show more like these', icon: '🔄' },
+          { text: 'Refine search', icon: '🔍' },
+          { text: 'Different style', icon: '👕' }
+        ]
       };
-    } else if (responseText) {
+    }
 
+    // Handle no results
+    if (matchedFilters.length > 0 && recommendedProducts.length === 0) {
       return {
-        text: `I'm sorry, we don't currently have any items matching your request. We're out of stock at the moment. Would you like to see some alternative suggestions?`,
+        text: `I couldn't find any items matching exactly what you're looking for. Would you like to see some similar alternatives or try a different search?`,
         isBot: true,
-        type: 'out-of-stock',
+        type: 'no-results',
         quickActions: [
           { text: 'Show alternatives', icon: '🔄' },
-          { text: 'Notify when available', icon: '🔔' },
-          { text: 'Browse other categories', icon: '🔍' }
+          { text: 'New search', icon: '🔍' },
+          { text: 'Browse all', icon: '👀' }
         ]
       };
     }
@@ -379,19 +569,24 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       }
     }
 
-    // Personal style recommendations
-    if (lowercaseMessage.includes('style') || lowercaseMessage.includes('recommend') || lowercaseMessage.includes('suggestion')) {
-      return {
-        text: "I'd love to recommend items that match your style! Could you tell me a bit about your preferences? Do you prefer casual, formal, or trendy looks? Any favorite colors or patterns?",
-        isBot: true,
-        type: 'style-recommendation',
-        quickActions: [
-          { text: 'Casual style', icon: '👕' },
-          { text: 'Formal style', icon: '👔' },
-          { text: 'Trendy looks', icon: '✨' },
-          { text: 'Color preferences', icon: '🎨' }
-        ]
-      };
+    // Handle personalization requests
+    if (lowercaseMessage.includes('recommend') || lowercaseMessage.includes('suggestion')) {
+      return generatePersonalizedResponse();
+    }
+
+    // Handle similar product requests
+    if (lowercaseMessage.includes('similar') && lastViewedProduct) {
+      return generateSimilarProductsResponse(lastViewedProduct);
+    }
+
+    // Handle complementary product requests
+    if ((lowercaseMessage.includes('complete') || lowercaseMessage.includes('match') || lowercaseMessage.includes('outfit')) && lastViewedProduct) {
+      return generateComplementaryResponse(lastViewedProduct);
+    }
+
+    // Handle size recommendation requests
+    if (lowercaseMessage.includes('size') && lastViewedProduct) {
+      return generateSizeRecommendation(lastViewedProduct);
     }
 
     // Handle general greeting or small talk
@@ -478,6 +673,46 @@ const Chatbot = ({ products, onProductRecommend, cartItems, wishlistItems }) => 
       default:
         return 'bg-gray-100 ml-4';
     }
+  };
+
+  const renderProductRecommendations = (message) => {
+    if (!message.products || message.products.length === 0) return null;
+
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="mt-4 space-y-4"
+      >
+        <div className="grid grid-cols-3 gap-3">
+          {message.products.map((product, idx) => (
+            <motion.div 
+              key={idx}
+              className="relative group"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleProductView(product)}
+            >
+              <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  className="w-full h-full object-cover transform transition-transform group-hover:scale-110"
+                />
+              </div>
+              <div className="mt-2 text-sm">
+                <p className="font-medium text-gray-900 truncate">{product.name}</p>
+                <p className="text-gray-500">${product.price}</p>
+                {message.type === 'similar' && (
+                  <p className="text-xs text-blue-600">
+                    {Math.round(product.similarity * 100)}% match
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    );
   };
 
   return (
