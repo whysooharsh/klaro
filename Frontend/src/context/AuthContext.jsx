@@ -28,38 +28,42 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
-  const login = (userData) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email === userData.email && u.password === userData.password);
-    
-    if (user) {
-      setUser(user);
-      localStorage.setItem('user', JSON.stringify(user));
-      return { success: true };
+  const login = async (userData) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        // Optionally, store token: localStorage.setItem('token', data.token);
+        return { success: true };
+      }
+      return { success: false, message: data.message || 'Login failed' };
+    } catch (error) {
+      return { success: false, message: 'Network error' };
     }
-    return { success: false, message: 'Invalid credentials' };
   };
 
-  const signup = (userData) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    if (users.some(user => user.email === userData.email)) {
-      return { success: false, message: 'Email already registered' };
+  const signup = async (userData) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      const data = await response.json();
+      if (response.ok) {
+        // Optionally, auto-login after signup
+        return await login({ email: userData.email, password: userData.password });
+      }
+      return { success: false, message: data.message || 'Signup failed' };
+    } catch (error) {
+      return { success: false, message: 'Network error' };
     }
-
-    const newUser = {
-      ...userData,
-      id: Date.now(),
-      createdAt: new Date().toISOString()
-    };
-    
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    setUser(newUser);
-    localStorage.setItem('user', JSON.stringify(newUser));
-    
-    return { success: true };
   };
 
   const logout = () => {
@@ -69,6 +73,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('cart');
     localStorage.removeItem('wishlist');
+    // Optionally, redirect to login or home page
+    window.location.href = '/login'; // or use navigate('/login') if using react-router
   };
 
   const addToCart = (product) => {

@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { FiUser, FiArrowLeft, FiMail, FiPhone, FiEdit, FiCamera, FiLogOut, FiSettings, FiHeart } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
+  const { user, logout } = useAuth();
 
 
   const containerVariants = {
@@ -86,7 +88,7 @@ const Profile = () => {
                   <FiCamera className="h-4 w-4 text-white" />
                 </motion.div>
               </div>
-              <h3 className="text-xl font-semibold text-center text-gray-100">Harsh Sharma</h3>
+              <h3 className="text-xl font-semibold text-center text-gray-100">{user?.name || ''}</h3>
               <p className="text-sm text-center text-gray-400">Member since 24/04/2025</p>
             </div>
             
@@ -118,7 +120,7 @@ const Profile = () => {
                   className="pt-4 mt-6 border-t border-gray-800"
                 >
                   <button
-                    onClick={() => navigate('/')}
+                    onClick={logout}
                     className="w-full flex items-center px-4 py-3 rounded-lg text-red-400 hover:text-red-300 transition-colors"
                   >
                     <FiLogOut className="mr-3 text-lg" />
@@ -171,7 +173,7 @@ const Profile = () => {
                           <input
                             type="text"
                             disabled={!isEditing}
-                            defaultValue="Harsh Sharma"
+                            defaultValue={user?.name || ''}
                             className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                           />
                         </div>
@@ -186,7 +188,7 @@ const Profile = () => {
                           <input
                             type="email"
                             disabled={!isEditing}
-                            defaultValue="whysooharsh@gmail.com"
+                            defaultValue={user?.email || ''}
                             className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                           />
                         </div>
@@ -201,7 +203,7 @@ const Profile = () => {
                           <input
                             type="tel"
                             disabled={!isEditing}
-                            defaultValue="+1 (555) 123-4567"
+                            defaultValue={user?.phone || ''}
                             className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                           />
                         </div>

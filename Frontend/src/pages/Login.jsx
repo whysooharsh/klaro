@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    const result = login(formData);
+    const result = await login(formData);
     
     if (result.success) {
       navigate('/profile');

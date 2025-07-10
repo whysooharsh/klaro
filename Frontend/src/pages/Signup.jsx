@@ -25,7 +25,7 @@ const Signup = () => {
       return;
     }
 
-    const result = signup(formData);
+    const result = await signup(formData);
     
     if (result.success) {
       navigate('/profile');
