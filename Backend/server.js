@@ -13,6 +13,11 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+const productRoutes = require('./routes/product');
+const orderRoutes = require('./routes/order');
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+
 // Test route
 app.get('/', (req, res) => {
   res.send('API is running...');

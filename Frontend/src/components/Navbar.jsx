@@ -8,7 +8,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cart } = useAuth();
+  const { cart, wishlist, user } = useAuth();
 
   const getCartItemsCount = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
@@ -17,7 +17,12 @@ const Navbar = () => {
   const navItems = [
     { path: '/', icon: FiHome, label: 'Home' },
     { path: '/shop', icon: FiShoppingBag, label: 'Shop' },
-    { path: '/wishlist', icon: FiHeart, label: 'Wishlist' },
+    { 
+      path: '/wishlist', 
+      icon: FiHeart, 
+      label: 'Wishlist',
+      badge: wishlist.length
+    },
     { 
       path: '/cart', 
       icon: FiShoppingCart, 
@@ -66,7 +71,7 @@ const Navbar = () => {
                 >
                   <div className="relative">
                     <Icon className="h-5 w-5" />
-                    {item.badge > 0 && item.path === '/cart' && (
+                    {item.badge > 0 && (item.path === '/cart' || item.path === '/wishlist') && (
                       <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                         {item.badge}
                       </div>
@@ -76,6 +81,11 @@ const Navbar = () => {
                 </Link>
               );
             })}
+            {user?.isAdmin && (
+              <Link to="/admin" className="text-blue-500 ml-4">
+                Admin Dashboard
+              </Link>
+            )}
           </div>
 
           <div className="md:hidden flex items-center">
@@ -113,7 +123,7 @@ const Navbar = () => {
                 >
                   <div className="relative">
                     <Icon className="h-5 w-5" />
-                    {item.badge > 0 && item.path === '/cart' && (
+                    {item.badge > 0 && (item.path === '/cart' || item.path === '/wishlist') && (
                       <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                         {item.badge}
                       </div>
