@@ -293,7 +293,7 @@ export default function Homepage() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full bg-black text-white py-2 text-center text-sm"
       >
-        FREE SHIPPING ON ALL ORDERS OVER $75 | USE CODE: BBDITM
+        FREE SHIPPING ON ALL ORDERS OVER $75 | USE CODE: XQC99
       </motion.div>
 
       <motion.div 
